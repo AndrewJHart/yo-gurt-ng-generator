@@ -1,4 +1,4 @@
-# generator-generator-rs-angular [![Build Status](https://secure.travis-ci.org/AndrewJHart/generator-generator-rs-angular.png?branch=master)](https://travis-ci.org/AndrewJHart/generator-generator-rs-angular)
+# generator-generator-rs-angular
 
 > [Yeoman](http://yeoman.io) generator
 
