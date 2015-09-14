@@ -1,0 +1,21 @@
+{
+  "name": "base-ng-proj",
+  "version": "1.0.0",
+  "description": "base ng project",
+  "license": "MIT",
+  "directory": "bower_components",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "lodash": "~3.10.1",
+    "jquery": "~2.1.4",
+    "bootstrap": "~3.3.5",
+    "angular": "~1.4.5",
+    "angular-ui-router": "~0.2.15"
+  }
+}

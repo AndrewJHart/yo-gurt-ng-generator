@@ -30,24 +30,24 @@ module.exports = yeoman.generators.Base.extend({
   writing: {
     app: function () {
       this.fs.copy(
-        this.templatePath('_package.json'),
-        this.destinationPath('package.json')
+        this.templatePath('src/_package.json'),
+        this.destinationPath('src/package.json')
       );
       this.fs.copy(
-        this.templatePath('_bower.json'),
-        this.destinationPath('bower.json')
+        this.templatePath('src/_bower.json'),
+        this.destinationPath('src/bower.json')
       );
     },
 
     projectfiles: function () {
-      this.fs.copy(
-        this.templatePath('editorconfig'),
-        this.destinationPath('.editorconfig')
-      );
-      this.fs.copy(
-        this.templatePath('jshintrc'),
-        this.destinationPath('.jshintrc')
-      );
+      // this.fs.copy(
+      //   this.templatePath('editorconfig'),
+      //   this.destinationPath('.editorconfig')
+      // );
+      // this.fs.copy(
+      //   this.templatePath('jshintrc'),
+      //   this.destinationPath('.jshintrc')
+      // );
     }
   },
 

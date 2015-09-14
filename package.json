@@ -1,6 +1,6 @@
 {
-  "name": "generator-generator-rs-angular",
-  "version": "0.0.0",
+  "name": "generator-rs-angular",
+  "version": "0.1.0",
   "description": "Yeoman generator",
   "license": "MIT",
   "main": "app/index.js",
@@ -14,7 +14,10 @@
     "test": "mocha"
   },
   "files": [
-    "generators"
+    "app",
+    "directive",
+    "scaffold.js",
+    "util.js"
   ],
   "keywords": [
     "yeoman-generator"
@@ -22,9 +25,11 @@
   "dependencies": {
     "yeoman-generator": "^0.19.0",
     "chalk": "^1.0.0",
-    "yosay": "^1.0.2"
+    "yosay": "^1.0.2",
+    "wiredep": "^2.2.0"
   },
   "devDependencies": {
-    "mocha": "*"
+    "mocha": "*",
+    "underscore.string": "^3.0.3"
   }
 }
