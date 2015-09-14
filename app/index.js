@@ -111,14 +111,17 @@ module.exports = yeoman.generators.Base.extend({
 
         var prompts = [{
           type: 'confirm',
-          name: 'moduleSchema',
-          message: 'Hows this ' + this.getModuleName() + ' for work for a name?'
+          name: 'confirm',
+          message: 'Hows does ' + this.getModuleName() + ' work for a name?',
+          default: true
         }];
 
         this.prompt(prompts, function (props) {
-          this.moduleSchema = props.moduleSchema;
-
-          this.log(this.moduleSchema);
+            if (props.confirm) {
+                this.log(this.moduleSchema);
+            } else {
+                this.env.error("Intentionally quitting...");
+            }
 
           done();
         }.bind(this));
