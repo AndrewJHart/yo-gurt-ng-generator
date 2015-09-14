@@ -13,8 +13,8 @@ var _ = require('underscore.string');
  */
 var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
 
-  sourceFilesPath: 'app/template/modules',
-  innerScriptPath: 'app/modules/',
+  sourceFilesPath: 'app/templates/modules',
+  innerScriptPath: 'src/modules/',
   scriptSuffix: '.js',
 
   constructor: function() {
@@ -93,9 +93,10 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
 
   generateSourceAndTest: function(appTemplate, testTemplate, targetDirectory, skipAdd) {
     // Services use classified names
-    // if (this.generatorName.toLowerCase() === 'service') {
-    //   this.cameledName = this.classedName;
-    // }
+    if (this.generatorName && this.generatorName.toLowerCase() === 'service') {
+      this.cameledName = this.classedName;
+      console.log(this.generatorName);
+    }
 
     // place template in proper dir using inner script path + target dir
     this.appTemplate(appTemplate, path.join(this.innerScriptPath, targetDirectory, this.name));

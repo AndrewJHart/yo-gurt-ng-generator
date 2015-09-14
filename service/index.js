@@ -1,19 +1,20 @@
 'use strict';
-var util = require('util');
-var Scaffold = require('../script-base.js');
+var ScaffoldGenerator = require('../scaffold.js');
 
+var ServiceGenerator = module.exports = ScaffoldGenerator.extend({
+	// set the name on the service generator
+	generatorName: 'service',
 
-var Generator = module.exports = function Generator() {
-  Scaffold.apply(this, arguments);
-};
+	contructor: function() {
+			ScaffoldGenerator.apply(this, arguments);
+	},
 
-util.inherits(Generator, Scaffold);
-
-Generator.prototype.createServiceFiles = function createServiceFiles() {
-  this.generateSourceAndTest(
-    'service/service',
-    'spec/service',
-    'services',
-    this.options['skip-add'] || false
-  );
-};
+	createServiceFiles: function() {
+	  this.generateSourceAndTest(
+	    'service/service',
+	    'spec/service',
+	    'services',
+	    this.options['skip-add'] || false
+	  );
+	}
+});
