@@ -37,7 +37,7 @@ module.exports = yeoman.generators.Base.extend({
         this.appPath = this.env.options.appPath;
     },
 
-    askModuleType: function () {
+    ask: function () {
         var done = this.async();
 
         // Have Yeoman greet the user.
@@ -63,7 +63,7 @@ module.exports = yeoman.generators.Base.extend({
               },
               {
                 value: 'collection',
-                name: 'colleciton',
+                name: 'collection',
                 checked: false
               },
               {
@@ -106,7 +106,7 @@ module.exports = yeoman.generators.Base.extend({
         }.bind(this));
     },
 
-    confirmModuleName: function () {
+    confirm: function () {
         var done = this.async();
 
         var prompts = [{
@@ -119,6 +119,10 @@ module.exports = yeoman.generators.Base.extend({
         this.prompt(prompts, function (props) {
             if (props.confirm) {
                 this.log(this.moduleSchema);
+
+                // update the module name prop
+                this.dotModuleName = this.getModuleName('.');
+                this.hypModuleName = this.getModuleName('-');
             } else {
                 this.env.error("Intentionally quitting...");
             }
@@ -127,8 +131,16 @@ module.exports = yeoman.generators.Base.extend({
         }.bind(this));
     },
 
-    getModuleName: function () {
-        return this.modulePrefix+'.'+this.moduleType+'.'+this.moduleName;
+    getModuleName: function (separator) {
+        if (!separator) {
+            separator = '.';  // default to dot notation if nothing passed
+        }
+
+        return this.modulePrefix
+                +separator
+                +this.moduleType
+                +separator
+                +this.moduleName;
     },
 
     writing: {
@@ -144,10 +156,10 @@ module.exports = yeoman.generators.Base.extend({
         },
 
         projectfiles: function () {
-          // this.fs.copy(
-          //   this.templatePath('editorconfig'),
-          //   this.destinationPath('.editorconfig')
-          // );
+          this.fs.copy(
+            this.templatePath('src/_package.json'),
+            this.destinationPath('src/'+this.dotModuleName+'.js')
+          );
           // this.fs.copy(
           //   this.templatePath('jshintrc'),
           //   this.destinationPath('.jshintrc')
