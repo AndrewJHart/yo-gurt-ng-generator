@@ -11,10 +11,9 @@ var _ = require('underscore.string');
  * creating the modules & tests.
  */
 var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
-
-  sourceFilesPath: 'app/templates/modules',
-  innerScriptPath: 'src/modules/',
-  scriptSuffix: '.js',
+  _sourceFilePath: 'app/templates/modules/',
+  _targetFilePath: 'app/',
+  _scriptSuffix: '.js',
 
   constructor: function() {
     var bowerJson = {};
@@ -51,13 +50,13 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
 
     this.env.options.testPath = this.env.options.testPath || bowerJson.testPath || 'test/spec';
 
-    this.sourceRoot(path.join(__dirname, this.sourceFilesPath));
+    this.sourceRoot(path.join(__dirname, this._sourceFilePath));
   },
 
   appTemplate: function(src, dest) {
     yeoman.generators.Base.prototype.template.apply(this, [
-      src + this.scriptSuffix,
-      path.join(this.env.options.appPath, dest.toLowerCase()) + this.scriptSuffix
+      src + this._scriptSuffix,
+      path.join(this.env.options.appPath, dest.toLowerCase()) + this._scriptSuffix
     ]);
   },
 
@@ -80,7 +79,7 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
         file: fullPath,
         needle: '<!-- endbuild -->',
         splicable: [
-          '<script src="src/' + this.innerScriptPath + script.toLowerCase().replace(/\\/g, '/') + '.js"></script>'
+          '<script src="src/' + this._targetFilePath + script.toLowerCase().replace(/\\/g, '/') + '.js"></script>'
         ]
       });
     } catch (e) {
@@ -97,8 +96,8 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
       console.log(this.generatorName);
     }
 
-    // place template in proper dir using inner script path + target dir
-    this.appTemplate(appTemplate, path.join(this.innerScriptPath, targetDirectory, this.name));
+    // place template in proper dir using target script path + target dir
+    this.appTemplate(appTemplate, path.join(targetDirectory, this.name));
     this.testTemplate(testTemplate, path.join(targetDirectory, this.name));
 
     if (!skipAdd) {

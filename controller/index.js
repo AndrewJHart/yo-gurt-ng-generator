@@ -2,8 +2,13 @@
 var ScaffoldGenerator = require('../scaffold.js');
 
 var CtrlGenerator = module.exports = ScaffoldGenerator.extend({
+
+  _targetFilePath: 'app/controllers',
+
   constructor: function() {
     ScaffoldGenerator.apply(this, arguments);
+
+    console.log('Source Path inherited from base class is: ' + this._sourceFilePath);
 
     // if the controller name is suffixed with ctrl, remove the suffix
     // if the controller name is just "ctrl," don't append/remove "ctrl"
@@ -16,7 +21,7 @@ var CtrlGenerator = module.exports = ScaffoldGenerator.extend({
     this.generateSourceAndTest(
       'controller',
       'spec/controller',
-      'controllers',
+      this._targetFilePath,
       this.options['skip-add'] || false
     );
   }

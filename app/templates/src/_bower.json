@@ -1,5 +1,6 @@
 {
-  "name": "base-ng-proj",
+  <% var ngVer = "1.3.0" %>
+  "name": "<%= _.slugify(_.humanize(appname)) %>",
   "version": "1.0.0",
   "description": "base ng project",
   "license": "MIT",
@@ -17,5 +18,9 @@
     "bootstrap": "~3.3.5",
     "angular": "~1.4.5",
     "angular-ui-router": "~0.2.15"
-  }
+  },
+  "devDependencies": {
+    "angular-mocks": "^<%= ngVer %>"
+  }<% if (appPath) { %>,
+    "appPath": "<%= appPath %>"<% } %>
 }
