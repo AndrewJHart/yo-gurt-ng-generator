@@ -4,7 +4,7 @@ var path = require('path'),
     util = require('util'),
     ScaffoldGenerator = require('../scaffold.js'),
     angularUtils = require('../util.js'),
-    bower = require(path.join(process.cwd(), 'bower.json'));
+    bower = require(path.join(process.cwd(), 'src/bower.json'));
 
 /**
  * Subclass of ScaffoldGenerator for creating routes

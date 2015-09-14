@@ -1,5 +1,7 @@
 'use strict';
-var ScaffoldGenerator = require('../scaffold.js');
+var ScaffoldGenerator = require('../scaffold.js'),
+	yosay = require('yosay'),
+	chalk = require('chalk');
 
 var DirectiveGenerator = module.exports = ScaffoldGenerator.extend({
 	constructor: function() {

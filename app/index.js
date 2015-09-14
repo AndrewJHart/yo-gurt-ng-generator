@@ -7,121 +7,154 @@ var yeoman = require('yeoman-generator'),
 
 
 module.exports = yeoman.generators.Base.extend({
-  constructor: function() {
-    yeoman.generators.Base.apply(this, arguments);
-    this.argument('appname', { type: String, required: true });
+    modulePrefix: 'rs',
 
-    this.appname = this.appname || path.basename(process.cwd());
-    this.appname = _.camelize(_.slugify(_.humanize(this.appname)));
+    constructor: function() {
+        yeoman.generators.Base.apply(this, arguments);
+        this.argument('appname', { type: String, required: true });
 
-    if (typeof this.env.options.appPath === 'undefined') {
-      this.option('appPath', {
-        desc: 'Allow to choose where to write the files'
-      });
+        this.appname = this.appname || path.basename(process.cwd());
+        this.appname = _.camelize(_.slugify(_.humanize(this.appname)));
+        this.scriptAppName = this.appname + angularUtils.appName(this);
 
-      this.env.options.appPath = this.options.appPath;
+        if (typeof this.env.options.appPath === 'undefined') {
+          this.option('appPath', {
+              desc: 'Allow to choose where to write the files'
+          });
 
-      if (!this.env.options.appPath) {
-        try {
-          this.env.options.appPath = require(path.join(process.cwd(), 'bower.json')).appPath;
-        } catch (e) {}
-      }
-      this.env.options.appPath = this.env.options.appPath || 'app';
-      this.options.appPath = this.env.options.appPath;
-    }
+          this.env.options.appPath = this.options.appPath;
 
-    this.appPath = this.env.options.appPath;
-  },
+          if (!this.env.options.appPath) {
+              try {
+                  this.env.options.appPath = require(path.join(process.cwd(), 'bower.json')).appPath;
+              } catch (e) { /* noop */ }
+          }
 
-  prompting: function () {
-    var done = this.async();
+          this.env.options.appPath = this.env.options.appPath || 'app';
+          this.options.appPath = this.env.options.appPath;
+        }
 
-    // Have Yeoman greet the user.
-    this.log(yosay(
-      'Welcome to the outstanding ' + chalk.red('GeneratorRsAngular') + ' generator!'
-    ));
-
-        this.option('app-suffix', {
-      desc: 'Allow a custom suffix to be added to the module name',
-      type: String
-    });
-    this.env.options['app-suffix'] = this.options['app-suffix'];
-    this.scriptAppName = this.appname + angularUtils.appName(this);
-
-
-    var prompts = [{
-      type: 'rawlist',
-      name: 'moduleType',
-      message: 'What kind of module is this?',
-      choices: [
-      {
-        value: 'core',
-        name: 'core',
-        checked: false
-      },
-      {
-        value: 'utility',
-        name: 'utility',
-        checked: false
-      },
-      {
-        value: 'collection',
-        name: 'colleciton',
-        checked: false
-      },
-      {
-        value: 'app',
-        name: 'app',
-        checked: false
-      },
-      {
-        value: 'custom',
-        name: 'custom',
-        checked: false
-      }]
-    }];
-
-    this.prompt(prompts, function (props) {
-      this.props = props;
-      // To access props later use this.props.someOption;
-
-      this.log("You chose " + this.props.moduleType);
-
-      done();
-    }.bind(this));
-  },
-
-  writing: {
-    app: function () {
-      this.fs.copy(
-        this.templatePath('src/_package.json'),
-        this.destinationPath('src/package.json')
-      );
-      this.fs.copy(
-        this.templatePath('src/_bower.json'),
-        this.destinationPath('src/bower.json')
-      );
+        this.appPath = this.env.options.appPath;
     },
 
-    projectfiles: function () {
-      // this.fs.copy(
-      //   this.templatePath('editorconfig'),
-      //   this.destinationPath('.editorconfig')
-      // );
-      // this.fs.copy(
-      //   this.templatePath('jshintrc'),
-      //   this.destinationPath('.jshintrc')
-      // );
+    askModuleType: function () {
+        var done = this.async();
+
+        // Have Yeoman greet the user.
+        this.log(yosay(
+          'Welcome to the outstanding ' + chalk.red('rewardStyle Angular Generator') + ' generator!'
+        ));
+
+        var prompts = [
+            {
+              type: 'list',
+              name: 'moduleType',
+              message: 'What kind of module is this?',
+              choices: [
+              {
+                value: 'core',
+                name: 'core',
+                checked: false
+              },
+              {
+                value: 'utility',
+                name: 'utility',
+                checked: false
+              },
+              {
+                value: 'collection',
+                name: 'colleciton',
+                checked: false
+              },
+              {
+                value: 'app',
+                name: 'app',
+                checked: false
+              },
+              {
+                value: 'custom',
+                name: 'custom',
+                checked: false
+              }]
+            },
+            {
+                type: 'input',
+                name: 'moduleName',
+                validate: function (input) {
+                    if (/^([a-zA-Z0-9_]*)$/.test(input)) return true;
+                    return 'Your application name cannot contain special characters or a blank space, using the default name instead';
+                },
+                message: 'What would you like to name this module?',
+                default: this.appname
+            }
+        ];
+
+        this.prompt(prompts, function (props) {
+          this.props = props;  // store props for later
+
+          this.moduleType = props.moduleType;
+          this.moduleName = props.moduleName;
+          this.finalModule = this.getModuleName()
+
+          this.log("You chose " + props.moduleType);
+          this.log("App Name " + this.appname);
+          this.log("module Name " + this.moduleName);
+          this.log("Final Module Output Name " + this.finalModule);
+
+          done();
+
+        }.bind(this));
+    },
+
+    confirmModuleName: function () {
+        var done = this.async();
+
+        var prompts = [{
+          type: 'confirm',
+          name: 'moduleSchema',
+          message: 'Hows this ' + this.getModuleName() + ' for work for a name?'
+        }];
+
+        this.prompt(prompts, function (props) {
+          this.moduleSchema = props.moduleSchema;
+
+          this.log(this.moduleSchema);
+
+          done();
+        }.bind(this));
+    },
+
+    getModuleName: function () {
+        return this.modulePrefix+'.'+this.moduleType+'.'+this.moduleName;
+    },
+
+    writing: {
+        app: function () {
+            this.fs.copy(
+                this.templatePath('src/_package.json'),
+                this.destinationPath('src/package.json')
+            );
+            this.fs.copy(
+                this.templatePath('src/_bower.json'),
+                this.destinationPath('src/bower.json')
+            );
+        },
+
+        projectfiles: function () {
+          // this.fs.copy(
+          //   this.templatePath('editorconfig'),
+          //   this.destinationPath('.editorconfig')
+          // );
+          // this.fs.copy(
+          //   this.templatePath('jshintrc'),
+          //   this.destinationPath('.jshintrc')
+          // );
+        }
+    },
+
+    install: function() {
+        // Change working directory to 'src' for dependency install
+        this.spawnCommand("npm", ["install"], {cwd: 'src'});
+        this.spawnCommand("bower", ["install"], {cwd: 'src'});
     }
-  },
-
-  install: function() {
-    // Change working directory to 'src' for dependency install
-    // var npmDir = process.cwd() + '/src';
-    // process.chdir(npmDir);
-
-    // this.installDependencies();
-    this.spawnCommand("npm", ["install"], {cwd: 'src'});
-    this.spawnCommand("bower", ["install"], {cwd: 'src'});
-  }
 });
