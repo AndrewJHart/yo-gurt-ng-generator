@@ -167,7 +167,7 @@ module.exports = yeoman.generators.Base.extend({
     },
 
     writing: {
-        app: function () {
+        root: function () {
             this.template(
                 this.templatePath('src/_package.json'),
                 this.destinationPath('src/package.json'),
@@ -179,8 +179,11 @@ module.exports = yeoman.generators.Base.extend({
               this.destinationPath('src/bower.json'),  // target path
               this                                     // template context
             );
+        },
 
+        app: function () {
             // temp set styles for template
+            // TODO: replace with actual script names
             this.styles = ['styles', 'stylesheet'];
             this.scripts = ['script1', 'script2'];
 
@@ -202,18 +205,6 @@ module.exports = yeoman.generators.Base.extend({
                 this.templatePath('src/app'),
                 this.destinationPath('src/app')
             );
-        },
-
-        projectfiles: function () {
-          // this.fs.copy(
-          //   this.templatePath('src/_package.json'),
-          //   this.destinationPath('src/'+this.dotModuleName)
-          // );
-          // this.fs.copy(
-          //   this.templatePath('jshintrc'),
-          //   this.destinationPath('.jshintrc')
-          // );
-
         }
     },
 
