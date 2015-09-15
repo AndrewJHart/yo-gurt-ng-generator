@@ -1,24 +1,31 @@
-var app = angular.module('<%= dotModuleName %>.container', [
+var app = angular.module('base.ng.proj.container', [
+    'base.ng.proj',
     'ui.router',
     'templates-app',
     'templates-components'
 ])
 
-.config(['$stateProvider', function ($stateProvider) {
-    $stateProvider.state('index', {
-        url: "",
-        views: {
-            "viewC": { template: "index.viewC" }
-        }
-    });
+.config(['$stateProvider',
+        '$locationProvider',
+        function ($stateProvider,
+                  $locationProvider) {
+
+    $locationProvider.html5Mode(true);
+
+    $stateProvider
+        .state('parent', { url: "/", templateUrl: 'root.tpl.html' });
 }])
 
-.controller('<%= dotModuleName %>.container.AppCtrl', ['$scope',
+.controller('base.ng.proj.container.AppCtrl', ['$scope',
                                                '$rootScope',
+                                               '$state',
                                                function AppCtrl ($scope,
-                                                                 $rootScope) {
+                                                                 $rootScope,
+                                                                 $state) {
 
-    $scope.title = '<%= dotModuleName %>';
+    console.log(':: initialized container');
+    console.log($state.get());
+    $scope.title = 'base.ng.proj';
 
 }])
 

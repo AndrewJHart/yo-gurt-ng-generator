@@ -29,6 +29,8 @@
     "wiredep": "^2.2.0"
   },
   "devDependencies": {
+    "mkdirp": "^0.5.1",
+    "mkdirp-promise": "^1.0.3",
     "mocha": "*",
     "underscore.string": "^3.0.3"
   }

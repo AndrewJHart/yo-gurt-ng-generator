@@ -1,8 +1,9 @@
 'use strict';
 var yeoman = require('yeoman-generator'),
-    chalk = require('chalk'),
-    yosay = require('yosay'),
-    _     = require('underscore.string'),
+    chalk  = require('chalk'),
+    yosay  = require('yosay'),
+    _      = require('underscore.string'),
+    mkdirp = require('mkdirp-promise'),
     angularUtils = require('../util');
 
 
@@ -184,8 +185,8 @@ module.exports = yeoman.generators.Base.extend({
         app: function () {
             // temp set styles for template
             // TODO: replace with actual script names
-            this.styles = ['styles', 'stylesheet'];
-            this.scripts = ['script1', 'script2'];
+            this.styles = [];
+            this.scripts = [];
 
             // copy index.html first to force interpolation
             this.template(
@@ -194,17 +195,36 @@ module.exports = yeoman.generators.Base.extend({
                 this
             );
 
+            // make the new dir to place base-ng-proj files
+            mkdirp(this.destinationPath('src/app/')+this.getModuleName('-'))
+                .then(function(path) {
+                    this.log('Created '+path);
+
+                    // mkdir success move on with following ops
+                    // copy the app dir & template files in it
+                    this.directory(
+                        this.templatePath('src/app'),
+                        this.destinationPath('src/app')
+                    );
+                })
+                .catch(function(err) {
+                    this.env.error(err);
+                });
+
+            // copy the files in `base-ng-project` dir & rename it
+            // this.template(
+            //     this.templatePath('src/app/base-ng-proj'),
+            //     this.destinationPath('src/app/'+this.getModuleName('-')+'/'),
+
+            // );
+
             // copy the entire root src dir & template it
             this.directory(
                 this.templatePath('src/'),
                 this.destinationPath('src/')
             );
 
-            // copy the app dir & template files in it
-            this.directory(
-                this.templatePath('src/app'),
-                this.destinationPath('src/app')
-            );
+
         }
     },
 
