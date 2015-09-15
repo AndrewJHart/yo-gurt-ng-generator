@@ -170,15 +170,30 @@ module.exports = yeoman.generators.Base.extend({
     writing: {
         root: function () {
             this.template(
-                this.templatePath('src/_package.json'),
-                this.destinationPath('src/package.json'),
+                this.templatePath('_package.json'),
+                this.destinationPath('package.json'),
                 this
             );
 
             this.template(
-              this.templatePath('src/_bower.json'),    // src path
-              this.destinationPath('src/bower.json'),  // target path
+              this.templatePath('_bower.json'),    // src path
+              this.destinationPath('bower.json'),  // target path
               this                                     // template context
+            );
+
+            this.fs.copy(
+                this.templatePath('_config.json'),
+                this.destinationPath('config.json')
+            );
+
+            this.fs.copy(
+                this.templatePath('_gulpfile.js'),
+                this.destinationPath('gulpfile.js')
+            );
+
+            this.fs.copy(
+                this.templatePath('_gitignore'),
+                this.destinationPath('.gitignore')
             );
         },
 
@@ -206,23 +221,17 @@ module.exports = yeoman.generators.Base.extend({
                         this.templatePath('src/app'),
                         this.destinationPath('src/app')
                     );
+
+                    // copy the entire root src dir & template it
+                    this.directory(
+                        this.templatePath('src/'),
+                        this.destinationPath()
+                    );
                 })
                 .catch(function(err) {
                     this.env.error(err);
                 });
 
-            // copy the files in `base-ng-project` dir & rename it
-            // this.template(
-            //     this.templatePath('src/app/base-ng-proj'),
-            //     this.destinationPath('src/app/'+this.getModuleName('-')+'/'),
-
-            // );
-
-            // copy the entire root src dir & template it
-            this.directory(
-                this.templatePath('src/'),
-                this.destinationPath('src/')
-            );
 
 
         }
