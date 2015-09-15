@@ -202,15 +202,13 @@ module.exports = yeoman.generators.Base.extend({
             this.template(
               this.templatePath('_bower.json'),    // src path
               this.destinationPath('bower.json'),  // target path
-              this,                                // template context
-              this.interpolation                   // mustache interpolation
+              this                                 // template context
             );
 
             this.template(
                 this.templatePath('_package.json'),
                 this.destinationPath('package.json'),
                 this
-                // this.interpolation - no interpolation.. fails for unknown reason.
             );
 
         },
@@ -229,14 +227,19 @@ module.exports = yeoman.generators.Base.extend({
                 .then(function(path) {
                     this.log('Created '+path);
 
+                    this.template(
+                        this.templatePath('src/app/container.less'),
+                        this.destinationPath('src/app/container.less'),
+                        this,
+                        this.interpolation
+                    );
 
-
-                    // this.template(
-                    //     this.templatePath('src/app/base-ng-proj/container.less'),
-                    //     this.destinationPath('src/app/'+this.getModuleName('.')+'/'),
-                    //     this,
-                    //     this.interpolation
-                    // );
+                    this.template(
+                        this.templatePath('src/app/container.js'),
+                        this.destinationPath('src/app/container.js'),
+                        this,
+                        this.interpolation
+                    );
                 })
                 .catch(function(err) {
                     this.env.error(err);
@@ -250,7 +253,49 @@ module.exports = yeoman.generators.Base.extend({
                     +this.hypModuleName
                     +'/'
                     +this.dotModuleName
+                    +'.ctrl'
                     +this.moduleSuffix),
+                this,
+                this.interpolation
+            );
+
+            this.template(
+                this.templatePath('src/app/base-ng-proj/base-ng-proj.module.js'),
+                this.destinationPath(
+                    'src/app/'
+                    +this.hypModuleName
+                    +'/'
+                    +this.dotModuleName
+                    +'.module'
+                    +this.moduleSuffix),
+                this,
+                this.interpolation
+            );
+
+            this.template(
+                this.templatePath('src/app/base-ng-proj/base-ng-proj.states.js'),
+                this.destinationPath(
+                    'src/app/'
+                    +this.hypModuleName
+                    +'/'
+                    +this.dotModuleName
+                    +'.states'
+                    +this.moduleSuffix),
+                this,
+                this.interpolation
+            );
+
+            // dirty hack -- fixes scope {{note}} ng data
+            // TODO: change interpolation yet again..
+            this.note = '{{note}}';
+            this.template(
+                this.templatePath('src/app/base-ng-proj/base-ng-proj.tpl.html'),
+                this.destinationPath(
+                    'src/app/'
+                    +this.hypModuleName
+                    +'/'
+                    +this.dotModuleName
+                    +'.tpl.html'),
                 this,
                 this.interpolation
             );
@@ -272,6 +317,7 @@ module.exports = yeoman.generators.Base.extend({
 
     install: function() {
         this.installDependencies();
+
         // Change working directory to 'src' for dependency install
         // this.spawnCommand("npm", ["install"], {cwd: 'src'});
         // this.spawnCommand("bower", ["install"], {cwd: 'src'});

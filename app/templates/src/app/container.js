@@ -30,3 +30,4 @@ var app = angular.module('{{= dotModuleName }}.container', [
 }])
 
 ;
+// <%= %>

@@ -1,5 +1,5 @@
+// {{= dotModuleName }} Controller
 angular.module('{{= dotModuleName }}')
-
 .controller('{{= dotModuleName }}.AppCtrl', ['$rootScope',
                                      '$scope',
                                      function AppCtrl ($rootScope, $scope) {
@@ -9,3 +9,4 @@ angular.module('{{= dotModuleName }}')
 }])
 
 ;
+// <%= %>
