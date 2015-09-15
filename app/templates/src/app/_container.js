@@ -1,4 +1,4 @@
-var app = angular.module('base.ng.proj.container', [
+var app = angular.module('<%= dotModuleName %>.container', [
     'ui.router',
     'templates-app',
     'templates-components'
@@ -18,7 +18,7 @@ var app = angular.module('base.ng.proj.container', [
                                                function AppCtrl ($scope,
                                                                  $rootScope) {
 
-    $scope.title = 'base.ng.proj';
+    $scope.title = '<%= dotModuleName %>';
 
 }])
 

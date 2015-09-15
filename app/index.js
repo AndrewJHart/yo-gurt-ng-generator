@@ -47,7 +47,7 @@ module.exports = yeoman.generators.Base.extend({
 
         // Have Yeoman greet the user.
         this.log(yosay(
-          'Welcome to the outstanding ' + chalk.red('rewardStyle Angular Generator') + ' generator!'
+          'Welcome to the outstanding ' + chalk.red('rewardStyle Angular') + ' generator!'
         ));
 
         var prompts = [
@@ -152,16 +152,15 @@ module.exports = yeoman.generators.Base.extend({
         if (this.isCustom()) {
             out = this.modulePrefix
                   +separator
-                  +this.moduleName
-                  +this.moduleSuffix;
+                  +this.moduleName;
         } else {
             // cat prefix, moduletype, & name for output
             out = this.modulePrefix
                   +separator
                   +this.moduleType
                   +separator
-                  +this.moduleName
-                  +this.moduleSuffix;
+                  +this.moduleName;
+                  //+this.moduleSuffix;
         }
 
         return out;
@@ -173,10 +172,24 @@ module.exports = yeoman.generators.Base.extend({
                 this.templatePath('src/_package.json'),
                 this.destinationPath('src/package.json')
             );
-            // this.fs.copy(
-            //     this.templatePath('src/_bower.json'),
-            //     this.destinationPath('src/bower.json')
-            // );
+
+            this.template(
+              this.templatePath('src/_bower.json'),    // src path
+              this.destinationPath('src/bower.json'),  // target path
+              this                                     // template context
+            );
+
+            // copy the entire root src dir & template it
+            this.directory(
+                this.templatePath('src/'),
+                this.destinationPath('src/')
+            );
+
+            // copy the app dir & template files in it
+            this.directory(
+                this.templatePath('src/app'),
+                this.destinationPath('src/app')
+            );
         },
 
         projectfiles: function () {
@@ -188,11 +201,7 @@ module.exports = yeoman.generators.Base.extend({
           //   this.templatePath('jshintrc'),
           //   this.destinationPath('.jshintrc')
           // );
-            this.template(
-              this.templatePath('src/_bower.json'),    // src path
-              this.destinationPath('src/bower.json'),  // target path
-              this                                     // template context
-            );
+
         }
     },
 
