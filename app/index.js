@@ -2,6 +2,8 @@
 var yeoman = require('yeoman-generator'),
     chalk  = require('chalk'),
     yosay  = require('yosay'),
+    path   = require('path'),
+    glob   = require('glob'),
     _      = require('underscore.string'),
     mkdirp = require('mkdirp-promise'),
     angularUtils = require('../util');
@@ -172,20 +174,6 @@ module.exports = yeoman.generators.Base.extend({
 
     writing: {
         root: function () {
-            this.template(
-                this.templatePath('_package.json'),
-                this.destinationPath('package.json'),
-                this,
-                this.interpolation
-            );
-
-            this.template(
-              this.templatePath('_bower.json'),    // src path
-              this.destinationPath('bower.json'),  // target path
-              this,                                // template context
-              this.interpolation
-            );
-
             this.fs.copy(
                 this.templatePath('_config.json'),
                 this.destinationPath('config.json')
@@ -209,6 +197,20 @@ module.exports = yeoman.generators.Base.extend({
             this.fs.copy(
                 this.templatePath('_jshintrc'),
                 this.destinationPath('.jshintrc')
+            );
+
+            this.template(
+                this.templatePath('_package.json'),
+                this.destinationPath('package.json'),
+                this
+                // this.interpolation
+            );
+
+            this.template(
+              this.templatePath('_bower.json'),    // src path
+              this.destinationPath('bower.json'),  // target path
+              this,                                // template context
+              this.interpolation
             );
         },
 
@@ -243,6 +245,21 @@ module.exports = yeoman.generators.Base.extend({
                         this.templatePath('src/'),
                         this.destinationPath()
                     );
+
+                    // copy files from `base-ng-proj` to nested module
+                    this.template(
+                        this.templatePath('src/app/base-ng-proj/container.js'),
+                        this.destinationPath('src/app/'+this.getModuleName('.')),
+                        this,
+                        this.interpolation
+                    );
+
+                    this.template(
+                        this.templatePath('src/app/base-ng-proj/container.less'),
+                        this.destinationPath('src/app/'+this.getModuleName('.')),
+                        this,
+                        this.interpolation
+                    );
                 })
                 .catch(function(err) {
                     this.env.error(err);
@@ -254,5 +271,42 @@ module.exports = yeoman.generators.Base.extend({
         // Change working directory to 'src' for dependency install
         this.spawnCommand("npm", ["install"], {cwd: 'src'});
         this.spawnCommand("bower", ["install"], {cwd: 'src'});
+    },
+
+    isPathAbsolute: function () {
+        var filepath = path.join.apply(path, arguments);
+        return path.resolve(filepath) === filepath;
+    },
+
+    // rewritten method for bulk copying with templating utilities & options
+    // Shared directory method
+    templateDiretory: function (source, destination, opts, process, bulk) {
+      // Only add sourceRoot if the path is not absolute
+      var root = this.isPathAbsolute(source) ? source : path.join(this.sourceRoot(), source),
+          files = glob.sync('**', { dot: true, nodir: true, cwd: root }),
+          options = opts || {};
+
+      destination = destination || source;
+
+      if (typeof destination === 'function') {
+        process = destination;
+        destination = source;
+      }
+
+      this.log('Triggered template dir with options... '+options);
+
+      var cp = this.copy;
+
+      if (bulk) {
+        cp = this.bulkCopy;
+      }
+
+      // get the path relative to the template root, and copy to the relative destination
+      for (var i in files) {
+        var dest = path.join(destination, files[i]);
+        cp.call(this, path.join(root, files[i]), dest, process);
+      }
+
+      return this;
     }
 });
