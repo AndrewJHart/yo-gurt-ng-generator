@@ -12,6 +12,11 @@ module.exports = yeoman.generators.Base.extend({
     moduleSuffix: '.js',
     dotModuleName: '',
     hypModuleName: '',
+    interpolation: {
+        evaluate: /\{\{([\s\S]+?)\}\}/g,
+        interpolate: /\{\{=([\s\S]+?)\}\}/g,
+        escape: /\{\{-([\s\S]+?)\}\}/g
+    },
 
     constructor: function() {
         yeoman.generators.Base.apply(this, arguments);
@@ -124,8 +129,6 @@ module.exports = yeoman.generators.Base.extend({
 
         this.prompt(prompts, function (props) {
             if (props.confirm) {
-                this.log(this.moduleSchema);
-
                 // update the module name prop
                 this.dotModuleName = this.getModuleName('.');
                 this.hypModuleName = this.getModuleName('-');
@@ -172,13 +175,15 @@ module.exports = yeoman.generators.Base.extend({
             this.template(
                 this.templatePath('_package.json'),
                 this.destinationPath('package.json'),
-                this
+                this,
+                this.interpolation
             );
 
             this.template(
               this.templatePath('_bower.json'),    // src path
               this.destinationPath('bower.json'),  // target path
-              this                                 // template context
+              this,                                // template context
+              this.interpolation
             );
 
             this.fs.copy(
@@ -217,7 +222,8 @@ module.exports = yeoman.generators.Base.extend({
             this.template(
                 this.templatePath('src/app/index.html'),
                 this.destinationPath('src/app/index.html'),
-                this
+                this,
+                this.interpolation
             );
 
             // make the new dir to place base-ng-proj files

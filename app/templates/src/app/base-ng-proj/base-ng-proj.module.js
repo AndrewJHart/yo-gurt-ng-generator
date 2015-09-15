@@ -1,4 +1,4 @@
-angular.module('base.ng.proj', [
+angular.module('{{= dotModuleName }}', [
     'ui.router'
 ])
 

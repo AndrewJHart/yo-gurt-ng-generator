@@ -1,6 +1,6 @@
-angular.module('base.ng.proj')
+angular.module('{{= dotModuleName }}')
 
-.controller('base.ng.proj.AppCtrl', ['$rootScope',
+.controller('{{= dotModuleName }}.AppCtrl', ['$rootScope',
                                      '$scope',
                                      function AppCtrl ($rootScope, $scope) {
 

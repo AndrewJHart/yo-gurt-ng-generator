@@ -1,5 +1,5 @@
-var app = angular.module('base.ng.proj.container', [
-    'base.ng.proj',
+var app = angular.module('{{= dotModuleName }}.container', [
+    '{{= dotModuleName }}',
     'ui.router',
     'templates-app',
     'templates-components'
@@ -16,7 +16,7 @@ var app = angular.module('base.ng.proj.container', [
         .state('parent', { url: "/", templateUrl: 'root.tpl.html' });
 }])
 
-.controller('base.ng.proj.container.AppCtrl', ['$scope',
+.controller('{{= dotModuleName }}.container.AppCtrl', ['$scope',
                                                '$rootScope',
                                                '$state',
                                                function AppCtrl ($scope,
@@ -25,7 +25,7 @@ var app = angular.module('base.ng.proj.container', [
 
     console.log(':: initialized container');
     console.log($state.get());
-    $scope.title = 'base.ng.proj';
+    $scope.title = '{{= dotModuleName }}';
 
 }])
 

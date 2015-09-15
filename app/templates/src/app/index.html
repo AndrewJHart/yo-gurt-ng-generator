@@ -1,6 +1,6 @@
 <html lang="en"
-      ng-app="<%= dotModuleName %>.container"
-      ng-controller="<%= dotModuleName %>.container.AppCtrl">
+      ng-app="{{= dotModuleName }}.container"
+      ng-controller="{{= dotModuleName }}.container.AppCtrl">
     <head>
         <title ng-bind="title"><%= dotModuleName %></title>
         <meta charset="utf-8">
@@ -27,7 +27,7 @@
                         <i class="fa fa-ellipsis-v"></i>
                     </button><!-- .navbar-toggle -->
                     <a href="../" class="navbar-brand">
-                        <%= hypModuleName %> staging area
+                        {{= hypModuleName }} staging area
                     </a>
                 </div><!-- .navbar-header -->
                 <nav id="bs-navbar" class="collapse navbar-collapse">
