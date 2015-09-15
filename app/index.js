@@ -143,7 +143,7 @@ module.exports = yeoman.generators.Base.extend({
         if (this.isCustom()) {
             out = this.modulePrefix
                   +separator
-                  +this.modulename
+                  +this.moduleName
                   +this.moduleSuffix;
         } else {
             // cat prefix, moduletype, & name for output
@@ -158,13 +158,21 @@ module.exports = yeoman.generators.Base.extend({
         return out;
     },
 
-    isCustom: function() {
+    isCustom: function () {
         // quick getter returns bool based on type of module
         // true if custom else false
 
-        this.log(this.moduleType === 'custom' ? true : false;)
+        this.log(this.moduleType === 'custom' ? true : false);
 
         return this.moduleType === 'custom' ? true : false;
+    },
+
+    getConfirmMessage: function () {
+        if (this.isCustom()) {
+            return 'Custom Module name'
+        } else {
+            return 'How does' + this.getModuleName() + ' work for a name?';
+        }
     },
 
     writing: {
@@ -182,7 +190,7 @@ module.exports = yeoman.generators.Base.extend({
         projectfiles: function () {
           this.fs.copy(
             this.templatePath('src/_package.json'),
-            this.destinationPath('src/'+this.dotModuleName+'.js')
+            this.destinationPath('src/'+this.dotModuleName)
           );
           // this.fs.copy(
           //   this.templatePath('jshintrc'),
