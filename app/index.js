@@ -8,6 +8,7 @@ var yeoman = require('yeoman-generator'),
 
 module.exports = yeoman.generators.Base.extend({
     modulePrefix: 'rs',
+    moduleSuffix: '.js',
 
     constructor: function() {
         yeoman.generators.Base.apply(this, arguments);
@@ -57,12 +58,12 @@ module.exports = yeoman.generators.Base.extend({
                 checked: false
               },
               {
-                value: 'utility',
+                value: 'util',
                 name: 'utility',
                 checked: false
               },
               {
-                value: 'collection',
+                value: 'coll',
                 name: 'collection',
                 checked: false
               },
@@ -132,15 +133,38 @@ module.exports = yeoman.generators.Base.extend({
     },
 
     getModuleName: function (separator) {
+        var out;
+
         if (!separator) {
             separator = '.';  // default to dot notation if nothing passed
         }
 
-        return this.modulePrefix
-                +separator
-                +this.moduleType
-                +separator
-                +this.moduleName;
+        // check for custom module - has no type output
+        if (this.isCustom()) {
+            out = this.modulePrefix
+                  +separator
+                  +this.modulename
+                  +this.moduleSuffix;
+        } else {
+            // cat prefix, moduletype, & name for output
+            out = this.modulePrefix
+                  +separator
+                  +this.moduleType
+                  +separator
+                  +this.moduleName
+                  +this.moduleSuffix;
+        }
+
+        return out;
+    },
+
+    isCustom: function() {
+        // quick getter returns bool based on type of module
+        // true if custom else false
+
+        this.log(this.moduleType === 'custom' ? true : false;)
+
+        return this.moduleType === 'custom' ? true : false;
     },
 
     writing: {
