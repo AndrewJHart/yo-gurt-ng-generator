@@ -1,15 +1,15 @@
 <html lang="en"
-      ng-app="base.ng.proj.container"
-      ng-controller="base.ng.proj.container.AppCtrl">
+      ng-app="<%= dotModuleName %>.container"
+      ng-controller="<%= dotModuleName %>.container.AppCtrl">
     <head>
-        <title ng-bind="title"></title>
+        <title ng-bind="title"><%= dotModuleName %></title>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <!-- compiled CSS --><% styles.forEach( function ( file ) { %>
+        <!-- compiled CSS --><% if(styles) styles.forEach( function ( file ) { %>
         <link rel="stylesheet" type="text/css" href="<%= file %>" /><% }); %>
-        <!-- compiled JavaScript --><% scripts.forEach( function ( file ) { %>
+        <!-- compiled JavaScript --><% if(scripts) scripts.forEach( function ( file ) { %>
         <script type="text/javascript" src="<%= file %>"></script><% }); %>
         <base href="/" />
     </head>
@@ -27,7 +27,7 @@
                         <i class="fa fa-ellipsis-v"></i>
                     </button><!-- .navbar-toggle -->
                     <a href="../" class="navbar-brand">
-                        base-ng-proj staging area
+                        <%= hypModuleName %> staging area
                     </a>
                 </div><!-- .navbar-header -->
                 <nav id="bs-navbar" class="collapse navbar-collapse">

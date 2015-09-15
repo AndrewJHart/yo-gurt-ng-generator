@@ -87,7 +87,7 @@ module.exports = yeoman.generators.Base.extend({
                 type: 'input',
                 name: 'moduleName',
                 validate: function (input) {
-                    if (/^([a-zA-Z0-9_]*)$/.test(input)) return true;
+                    if (/^([a-zA-Z0-9_-]*)$/.test(input)) return true;
                     return 'Your module name cannot contain special characters or a blank space, using the default name instead';
                 },
                 message: 'What would you like to name this module?',
@@ -178,7 +178,7 @@ module.exports = yeoman.generators.Base.extend({
             this.template(
               this.templatePath('_bower.json'),    // src path
               this.destinationPath('bower.json'),  // target path
-              this                                     // template context
+              this                                 // template context
             );
 
             this.fs.copy(
@@ -195,13 +195,23 @@ module.exports = yeoman.generators.Base.extend({
                 this.templatePath('_gitignore'),
                 this.destinationPath('.gitignore')
             );
+
+            this.fs.copy(
+                this.templatePath('_vendor_config.js'),
+                this.destinationPath('vendor_config.js')
+            );
+
+            this.fs.copy(
+                this.templatePath('_jshintrc'),
+                this.destinationPath('.jshintrc')
+            );
         },
 
         app: function () {
             // temp set styles for template
             // TODO: replace with actual script names
-            this.styles = [];
-            this.scripts = [];
+            this.styles = null;
+            this.scripts = null;
 
             // copy index.html first to force interpolation
             this.template(
@@ -231,9 +241,6 @@ module.exports = yeoman.generators.Base.extend({
                 .catch(function(err) {
                     this.env.error(err);
                 });
-
-
-
         }
     },
 
