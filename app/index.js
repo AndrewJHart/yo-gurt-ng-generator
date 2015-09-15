@@ -312,6 +312,12 @@ module.exports = yeoman.generators.Base.extend({
                 this.interpolation
             );
 
+            // copy empty template
+            this.fs.copy(
+                this.templatePath('src/_blank.tpl.html'),
+                this.destinationPath('src/blank.tpl.html')
+            );
+
             // mkdir success move on with following ops
             // copy the app dir & template files in it
             // this.directory(
