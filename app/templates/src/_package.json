@@ -1,5 +1,5 @@
 {
-  "name": "base-ng-proj",
+  "name": "<%= dotModuleName %>",
   "private": true,
   "version": "1.0.0",
   "author": "",

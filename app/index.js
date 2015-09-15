@@ -168,15 +168,27 @@ module.exports = yeoman.generators.Base.extend({
 
     writing: {
         app: function () {
-            this.fs.copy(
+            this.template(
                 this.templatePath('src/_package.json'),
-                this.destinationPath('src/package.json')
+                this.destinationPath('src/package.json'),
+                this
             );
 
             this.template(
               this.templatePath('src/_bower.json'),    // src path
               this.destinationPath('src/bower.json'),  // target path
               this                                     // template context
+            );
+
+            // temp set styles for template
+            this.styles = ['styles', 'stylesheet'];
+            this.scripts = ['script1', 'script2'];
+
+            // copy index.html first to force interpolation
+            this.template(
+                this.templatePath('src/app/index.html'),
+                this.destinationPath('src/app/index.html'),
+                this
             );
 
             // copy the entire root src dir & template it

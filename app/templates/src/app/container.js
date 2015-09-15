@@ -13,7 +13,7 @@ var app = angular.module('<%= dotModuleName %>.container', [
     });
 }])
 
-.controller('base.ng.proj.container.AppCtrl', ['$scope',
+.controller('<%= dotModuleName %>.container.AppCtrl', ['$scope',
                                                '$rootScope',
                                                function AppCtrl ($scope,
                                                                  $rootScope) {

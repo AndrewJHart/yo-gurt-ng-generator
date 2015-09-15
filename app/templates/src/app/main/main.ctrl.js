@@ -1,11 +1,11 @@
-angular.module('base.ng.proj')
+angular.module('<%= dotModuleName %>')
 
-.controller('base.ng.proj.AppCtrl', ['$rootScope',
+.controller('<%= dotModuleName %>.AppCtrl', ['$rootScope',
                                      '$scope',
                                      function AppCtrl ($rootScope, $scope) {
-    console.log('init base.ng.proj.AppCtrl');
-    $scope.note = 'base.ng.proj AppCtrl module';
-    $scope.title = 'base.ng.proj';
+    console.log('init <%= dotModuleName %>.AppCtrl');
+    $scope.note = '<%= dotModuleName %> AppCtrl module';
+    $scope.title = '<%= dotModuleName %>';
 }])
 
 ;
