@@ -38,6 +38,8 @@ module.exports = yeoman.generators.Base.extend({
         }
 
         this.appPath = this.env.options.appPath;
+        this.ngVer = '1.4.0';  // currently used for ng-mocks version in bower
+        this.version = '0.1.0';
     },
 
     ask: function () {
@@ -187,12 +189,9 @@ module.exports = yeoman.generators.Base.extend({
           //   this.destinationPath('.jshintrc')
           // );
             this.template(
-              this.templatePath('src/_bower.json'),
-              this.destinationPath('src/bower.json'),
-              {
-                appname: this.appname,
-                ngVer: '1.4.0'
-              }
+              this.templatePath('src/_bower.json'),    // src path
+              this.destinationPath('src/bower.json'),  // target path
+              this                                     // template context
             );
         }
     },
