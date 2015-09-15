@@ -200,26 +200,22 @@ module.exports = yeoman.generators.Base.extend({
             );
 
             this.template(
-                this.templatePath('_package.json'),
-                this.destinationPath('package.json'),
-                this
-                // this.interpolation
-            );
-
-            this.template(
               this.templatePath('_bower.json'),    // src path
               this.destinationPath('bower.json'),  // target path
               this,                                // template context
-              this.interpolation
+              this.interpolation                   // mustache interpolation
             );
+
+            this.template(
+                this.templatePath('_package.json'),
+                this.destinationPath('package.json'),
+                this
+                // this.interpolation - no interpolation.. fails for unknown reason.
+            );
+
         },
 
         app: function () {
-            // temp set styles for template
-            // TODO: replace with actual script names
-            this.styles = null;
-            this.scripts = null;
-
             // copy index.html first to force interpolation
             this.template(
                 this.templatePath('src/app/index.html'),
@@ -229,84 +225,92 @@ module.exports = yeoman.generators.Base.extend({
             );
 
             // make the new dir to place base-ng-proj files
-            mkdirp(this.destinationPath('src/app/')+this.getModuleName('-'))
+            mkdirp(this.destinationPath('src/app/')+this.hypModuleName)
                 .then(function(path) {
                     this.log('Created '+path);
 
-                    // mkdir success move on with following ops
-                    // copy the app dir & template files in it
-                    this.directory(
-                        this.templatePath('src/app'),
-                        this.destinationPath('src/app')
-                    );
 
-                    // copy the entire root src dir & template it
-                    this.directory(
-                        this.templatePath('src/'),
-                        this.destinationPath()
-                    );
 
-                    // copy files from `base-ng-proj` to nested module
-                    this.template(
-                        this.templatePath('src/app/base-ng-proj/container.js'),
-                        this.destinationPath('src/app/'+this.getModuleName('.')),
-                        this,
-                        this.interpolation
-                    );
-
-                    this.template(
-                        this.templatePath('src/app/base-ng-proj/container.less'),
-                        this.destinationPath('src/app/'+this.getModuleName('.')),
-                        this,
-                        this.interpolation
-                    );
+                    // this.template(
+                    //     this.templatePath('src/app/base-ng-proj/container.less'),
+                    //     this.destinationPath('src/app/'+this.getModuleName('.')+'/'),
+                    //     this,
+                    //     this.interpolation
+                    // );
                 })
                 .catch(function(err) {
                     this.env.error(err);
                 });
+
+            // copy files from `base-ng-proj` to nested module
+            this.template(
+                this.templatePath('src/app/base-ng-proj/base-ng-proj.ctrl.js'),
+                this.destinationPath(
+                    'src/app/'
+                    +this.hypModuleName
+                    +'/'
+                    +this.dotModuleName
+                    +this.moduleSuffix),
+                this,
+                this.interpolation
+            );
+
+            // mkdir success move on with following ops
+            // copy the app dir & template files in it
+            // this.directory(
+            //     this.templatePath('src/app'),
+            //     this.destinationPath('src/app')
+            // );
+
+            // copy the entire root src dir & template it
+            // this.directory(
+            //     this.templatePath('src'),
+            //     this.destinationPath()
+            // );
         }
     },
 
     install: function() {
+        this.installDependencies();
         // Change working directory to 'src' for dependency install
-        this.spawnCommand("npm", ["install"], {cwd: 'src'});
-        this.spawnCommand("bower", ["install"], {cwd: 'src'});
+        // this.spawnCommand("npm", ["install"], {cwd: 'src'});
+        // this.spawnCommand("bower", ["install"], {cwd: 'src'});
     },
 
-    isPathAbsolute: function () {
-        var filepath = path.join.apply(path, arguments);
-        return path.resolve(filepath) === filepath;
-    },
+    // isPathAbsolute: function () {
+    //     var filepath = path.join.apply(path, arguments);
+    //     return path.resolve(filepath) === filepath;
+    // },
 
-    // rewritten method for bulk copying with templating utilities & options
-    // Shared directory method
-    templateDiretory: function (source, destination, opts, process, bulk) {
-      // Only add sourceRoot if the path is not absolute
-      var root = this.isPathAbsolute(source) ? source : path.join(this.sourceRoot(), source),
-          files = glob.sync('**', { dot: true, nodir: true, cwd: root }),
-          options = opts || {};
+    // // rewritten method for bulk copying with templating utilities & options
+    // // Shared directory method
+    // templateDiretory: function (source, destination, opts, process, bulk) {
+    //   // Only add sourceRoot if the path is not absolute
+    //   var root = this.isPathAbsolute(source) ? source : path.join(this.sourceRoot(), source),
+    //       files = glob.sync('**', { dot: true, nodir: true, cwd: root }),
+    //       options = opts || {};
 
-      destination = destination || source;
+    //   destination = destination || source;
 
-      if (typeof destination === 'function') {
-        process = destination;
-        destination = source;
-      }
+    //   if (typeof destination === 'function') {
+    //     process = destination;
+    //     destination = source;
+    //   }
 
-      this.log('Triggered template dir with options... '+options);
+    //   this.log('Triggered template dir with options... '+options);
 
-      var cp = this.copy;
+    //   var cp = this.copy;
 
-      if (bulk) {
-        cp = this.bulkCopy;
-      }
+    //   if (bulk) {
+    //     cp = this.bulkCopy;
+    //   }
 
-      // get the path relative to the template root, and copy to the relative destination
-      for (var i in files) {
-        var dest = path.join(destination, files[i]);
-        cp.call(this, path.join(root, files[i]), dest, process);
-      }
+    //   // get the path relative to the template root, and copy to the relative destination
+    //   for (var i in files) {
+    //     var dest = path.join(destination, files[i]);
+    //     cp.call(this, path.join(root, files[i]), dest, process);
+    //   }
 
-      return this;
-    }
+    //   return this;
+    // }
 });

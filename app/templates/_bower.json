@@ -19,6 +19,5 @@
     "angular-ui-router": "~0.2.15"
   },
   "devDependencies": {
-    "angular-mocks": "^<%= ngVer %>"
   }
 }
