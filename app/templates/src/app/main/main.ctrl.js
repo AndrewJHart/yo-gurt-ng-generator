@@ -4,8 +4,8 @@ angular.module('<%= dotModuleName %>')
                                      '$scope',
                                      function AppCtrl ($rootScope, $scope) {
     console.log('init <%= dotModuleName %>.AppCtrl');
-    $scope.note = '<%= dotModuleName %> AppCtrl module';
-    $scope.title = '<%= dotModuleName %>';
+    $scope.note = '<%= hypModuleName %> AppCtrl module';
+    $scope.title = '<%= hypModuleName %>';
 }])
 
 ;
