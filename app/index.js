@@ -224,26 +224,38 @@ module.exports = yeoman.generators.Base.extend({
 
             // make the new dir to place base-ng-proj files
             mkdirp(this.destinationPath('src/app/')+this.hypModuleName)
-                .then(function(path) {
-                    this.log('Created '+path);
-
-                    this.template(
-                        this.templatePath('src/app/container.less'),
-                        this.destinationPath('src/app/container.less'),
-                        this,
-                        this.interpolation
-                    );
-
-                    this.template(
-                        this.templatePath('src/app/container.js'),
-                        this.destinationPath('src/app/container.js'),
-                        this,
-                        this.interpolation
-                    );
-                })
                 .catch(function(err) {
                     this.env.error(err);
                 });
+
+            // generate templates for src dir
+            this.template(
+                this.templatePath('src/app/container.less'),
+                this.destinationPath('src/app/container.less'),
+                this,
+                this.interpolation
+            );
+
+            this.template(
+                this.templatePath('src/app/container.js'),
+                this.destinationPath('src/app/container.js'),
+                this,
+                this.interpolation
+            );
+
+            // just copy the dist.html directly
+            this.template(
+                this.templatePath('src/app/dist.html'),
+                this.destinationPath('src/app/dist.html'),
+                this,
+                this.interpolation
+            );
+
+            this.template(
+                this.templatePath('src/app/root.tpl.html'),
+                this.destinationPath('src/app/root.tpl.html'),
+                this
+            );
 
             // copy files from `base-ng-proj` to nested module
             this.template(
@@ -287,7 +299,7 @@ module.exports = yeoman.generators.Base.extend({
 
             // dirty hack -- fixes scope {{note}} ng data
             // TODO: change interpolation yet again..
-            this.note = '{{note}}';
+            this.note = '{{- note }}';
             this.template(
                 this.templatePath('src/app/base-ng-proj/base-ng-proj.tpl.html'),
                 this.destinationPath(

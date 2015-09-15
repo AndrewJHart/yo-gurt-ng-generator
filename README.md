@@ -23,16 +23,28 @@ npm install -g yo
 
 Yeoman travels light. He didn't pack any generators when he moved in. You can think of a generator like a plug-in. You get to choose what type of application you wish to create, such as a Backbone application or even a Chrome extension.
 
-To install generator-rs-angular from npm, run:
+To install generator-rs-angular clone this repo:
 
 ```bash
-npm install -g generator-rs-angular
+git clone git@github.com:AndrewJHart/generator-rs-angular.git
 ```
 
-Finally, initiate the generator:
+cd into the directory and run:
 
 ```bash
-yo rs-angular
+npm link
+```
+
+Go up a directory (or somewhere else) and make a new directory:
+
+```bash
+mkdir my-test-app && cd $_
+```
+
+Finally, initiate the generator and pass your app name e.g. my-test-app:
+
+```bash
+yo rs-angular my-test-app
 ```
 
 ### Getting To Know Yeoman
