@@ -1,5 +1,5 @@
 {
-  "name": "<%= _.slugify(_.humanize(appname)) %>",
+  "name": "<%= appname %>",
   "version": "1.0.0",
   "description": "base ng project",
   "license": "MIT",
@@ -20,6 +20,5 @@
   },
   "devDependencies": {
     "angular-mocks": "^<%= ngVer %>"
-  }<% if (appPath) { %>,
-    "appPath": "<%= appPath %>"<% } %>
+  }
 }

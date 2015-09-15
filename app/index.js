@@ -9,6 +9,8 @@ var yeoman = require('yeoman-generator'),
 module.exports = yeoman.generators.Base.extend({
     modulePrefix: 'rs',
     moduleSuffix: '.js',
+    dotModuleName: '',
+    hypModuleName: '',
 
     constructor: function() {
         yeoman.generators.Base.apply(this, arguments);
@@ -83,7 +85,7 @@ module.exports = yeoman.generators.Base.extend({
                 name: 'moduleName',
                 validate: function (input) {
                     if (/^([a-zA-Z0-9_]*)$/.test(input)) return true;
-                    return 'Your application name cannot contain special characters or a blank space, using the default name instead';
+                    return 'Your module name cannot contain special characters or a blank space, using the default name instead';
                 },
                 message: 'What would you like to name this module?',
                 default: this.appname
@@ -97,10 +99,10 @@ module.exports = yeoman.generators.Base.extend({
           this.moduleName = props.moduleName;
           this.finalModule = this.getModuleName()
 
-          this.log("You chose " + props.moduleType);
-          this.log("App Name " + this.appname);
-          this.log("module Name " + this.moduleName);
-          this.log("Final Module Output Name " + this.finalModule);
+          // this.log("You chose " + props.moduleType);
+          // this.log("App Name " + this.appname);
+          // this.log("module Name " + this.moduleName);
+          // this.log("Final Module Output Name " + this.finalModule);
 
           done();
 
@@ -125,11 +127,16 @@ module.exports = yeoman.generators.Base.extend({
                 this.dotModuleName = this.getModuleName('.');
                 this.hypModuleName = this.getModuleName('-');
             } else {
-                this.env.error("Intentionally quitting...");
+                this.env.error("Aborted by user. Intentionally quitting...");
             }
 
           done();
         }.bind(this));
+    },
+
+    isCustom: function () {
+        // quick getter returns bool based on type of module
+        return this.moduleType === 'custom' ? true : false;
     },
 
     getModuleName: function (separator) {
@@ -158,44 +165,35 @@ module.exports = yeoman.generators.Base.extend({
         return out;
     },
 
-    isCustom: function () {
-        // quick getter returns bool based on type of module
-        // true if custom else false
-
-        this.log(this.moduleType === 'custom' ? true : false);
-
-        return this.moduleType === 'custom' ? true : false;
-    },
-
-    getConfirmMessage: function () {
-        if (this.isCustom()) {
-            return 'Custom Module name'
-        } else {
-            return 'How does' + this.getModuleName() + ' work for a name?';
-        }
-    },
-
     writing: {
         app: function () {
             this.fs.copy(
                 this.templatePath('src/_package.json'),
                 this.destinationPath('src/package.json')
             );
-            this.fs.copy(
-                this.templatePath('src/_bower.json'),
-                this.destinationPath('src/bower.json')
-            );
+            // this.fs.copy(
+            //     this.templatePath('src/_bower.json'),
+            //     this.destinationPath('src/bower.json')
+            // );
         },
 
         projectfiles: function () {
-          this.fs.copy(
-            this.templatePath('src/_package.json'),
-            this.destinationPath('src/'+this.dotModuleName)
-          );
+          // this.fs.copy(
+          //   this.templatePath('src/_package.json'),
+          //   this.destinationPath('src/'+this.dotModuleName)
+          // );
           // this.fs.copy(
           //   this.templatePath('jshintrc'),
           //   this.destinationPath('.jshintrc')
           // );
+            this.template(
+              this.templatePath('src/_bower.json'),
+              this.destinationPath('src/bower.json'),
+              {
+                appname: this.appname,
+                ngVer: '1.4.0'
+              }
+            );
         }
     },
 
