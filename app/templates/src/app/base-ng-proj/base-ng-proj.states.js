@@ -5,7 +5,7 @@ angular.module('{{= dotModuleName }}')
     $stateProvider
         .state('{{= hypModuleName }}', {
             url: "/{{= hypModuleName }}",
-            templateUrl: '{{= hypModuleName }}/{{= hypModuleName }}.tpl.html',
+            templateUrl: '{{= hypModuleName }}/{{= dotModuleName }}.tpl.html',
             controller: '{{= dotModuleName }}.AppCtrl'
         });
 }])
