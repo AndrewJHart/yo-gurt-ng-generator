@@ -333,16 +333,16 @@ module.exports = yeoman.generators.Base.extend({
 
             // revert to default ejs interpolation for this specific template
             // this.note = '{{- note }}';
-            // this.template(
-            //     this.templatePath('src/app/base-ng-proj/base-ng-proj.tpl.html'),
-            //     this.destinationPath(
-            //         'src/app/'
-            //         +this.hypModuleName
-            //         +'/'
-            //         +this.dotModuleName
-            //         +'.tpl.html'),
-            //     this
-            // );
+            this.template(
+                this.templatePath('src/app/base-ng-proj/base-ng-proj.tpl.html'),
+                this.destinationPath(
+                    'src/app/'
+                    +this.hypModuleName
+                    +'/'
+                    +this.dotModuleName
+                    +'.tpl.html'),
+                this
+            );
 
             // copy empty template
             this.fs.copy(
