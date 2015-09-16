@@ -1,5 +1,5 @@
 {
-  "name": "<%= appname %>",
+  "name": "<%= hypModuleName %>",
   "version": "1.0.0",
   "description": "base ng project",
   "directory": "bower_components",

@@ -1,5 +1,5 @@
 {
-  "name": "<%= appname %>",
+  "name": "<%= hypModuleName %>",
   "private": true,
   "version": "1.0.0",
   "author": "",
