@@ -13,21 +13,36 @@ var app = angular.module('{{= dotModuleName }}.container', [
     $locationProvider.html5Mode(true);
 
     $stateProvider
-        .state('parent', { url: "/", templateUrl: 'root.tpl.html' });
+        .state('parent', {
+            url: "/",
+            templateUrl: 'root.tpl.html' });
 }])
+
+.factory('lodash', ['$window', function ($window) {
+  return $window._;
+}])
+
+.factory('containerConfig', function () {
+  /* jshint ignore:start */
+  return <%= containerConfig %>;
+  /* jshint ignore:end */
+})
 
 .controller('{{= dotModuleName }}.container.AppCtrl', ['$scope',
                                                '$rootScope',
                                                '$state',
+                                               'lodash',
                                                function AppCtrl ($scope,
                                                                  $rootScope,
-                                                                 $state) {
+                                                                 $state,
+                                                                 _) {
 
-    console.log(':: initialized container');
-    console.log($state.get());
+    console.log(':: init {{= dotModuleName }}.container.AppCtrl');
     $scope.title = '{{= dotModuleName }}';
 
 }])
+
+
 
 ;
 // <%= %>

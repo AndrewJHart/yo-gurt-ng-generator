@@ -200,6 +200,12 @@ module.exports = yeoman.generators.Base.extend({
             );
 
             this.template(
+              this.templatePath('_bowerrc'),    // src path
+              this.destinationPath('.bowerrc'),  // target path
+              this                                 // template context
+            );
+
+            this.template(
               this.templatePath('_bower.json'),    // src path
               this.destinationPath('bower.json'),  // target path
               this                                 // template context
@@ -208,6 +214,12 @@ module.exports = yeoman.generators.Base.extend({
             this.template(
                 this.templatePath('_package.json'),
                 this.destinationPath('package.json'),
+                this
+            );
+
+            this.template(
+                this.templatePath('_karma.conf.js'),
+                this.destinationPath('karma.conf.js'),
                 this
             );
 
@@ -297,8 +309,20 @@ module.exports = yeoman.generators.Base.extend({
                 this.interpolation
             );
 
-            // dirty hack -- fixes scope {{note}} ng data
-            // TODO: change interpolation yet again..
+            this.template(
+                this.templatePath('src/app/base-ng-proj/base-ng-proj.spec.js'),
+                this.destinationPath(
+                    'src/app/'
+                    +this.hypModuleName
+                    +'/'
+                    +this.dotModuleName
+                    +'.spec'
+                    +this.moduleSuffix),
+                this,
+                this.interpolation
+            );
+
+            // revert to default ejs interpolation for this specific template
             this.note = '{{- note }}';
             this.template(
                 this.templatePath('src/app/base-ng-proj/base-ng-proj.tpl.html'),
@@ -308,8 +332,7 @@ module.exports = yeoman.generators.Base.extend({
                     +'/'
                     +this.dotModuleName
                     +'.tpl.html'),
-                this,
-                this.interpolation
+                this
             );
 
             // copy empty template

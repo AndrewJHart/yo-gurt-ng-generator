@@ -11,8 +11,7 @@ var fs = require('fs');
 var glob = require('glob');
 var globLoader = require('node-glob-loader');
 var gulp = require('gulp');
-var minifyCss = require('gulp-minify-css');
-var nghtml2js = require('gulp-ng-html2js');
+var opn = require('opn');
 var path = require('path');
 var pkg = require('./package.json');
 var semver = require('semver');
@@ -21,9 +20,29 @@ var url = require('url');
 var vendorConfig = require('./vendor_config.js');
 
 var config = {
-    banner: '/**\n' +
-            ' * Copyright (c) rewardStyle \n' +
-            ' */',
+    banner: '/*\n' +
+            ' *                    *** ### ### ***\n' +
+            ' *                *##                 ##*\n' +
+            ' *            *##                         ##*\n' +
+            ' *         *##                   #######     ##*\n' +
+            ' *       *##                   /       ###     ##*\n' +
+            ' *     *##                    /         ##       ##*\n' +
+            ' *    *##      ***  ****      ##        #         ##*\n' +
+            ' *   *##        **** ****      ###                 ##*\n' +
+            ' *  *##          **   ****    ## ###                ##*\n' +
+            ' *  *##          **            ### ###              ##*\n' +
+            ' *  *##          **              ### ###            ##*     Copyright (c) rewardStyle\n' +
+            ' *  *##          **                ### /##          ##*\n' +
+            ' *  *##          **                  #/ /##         ##*\n' +
+            ' *   *##         **                   #/ ##        ##*\n' +
+            ' *    *##        ***                   # /        ##*\n' +
+            ' *     *##        ***        /##        /        ##*\n' +
+            ' *       *##                /  ########/       ##*\n' +
+            ' *         *#                    #####       ##*\n' +
+            ' *            *##                         ##*\n' +
+            ' *                *##                 ##*\n' +
+            ' *                    *** ### ### ***\n' +
+            ' */\n\n',
     paths: {
         app: {
             assets: ['src/assets/**'],
@@ -34,7 +53,11 @@ var config = {
                       '!src/**/container.js',
                       '!src/assets/**/*.js'],
             styles: ['src/**/main.less'],
-            templates: ['src/app/**/*.tpl.html']
+            templates: ['src/app/**/*.tpl.html'],
+            testScripts: ['src/**/*.module.js',
+                          'src/**/*.js',
+                          '!src/**/container.js',
+                          '!src/assets/**/*.js'],
         },
         build: {
             assets: 'assets',
@@ -55,7 +78,7 @@ var config = {
             scripts: [bower.directory + '/rs-*/**/*.module.js',
                       bower.directory + '/rs-*/**/.js',
                       // uncomment to enable app specific routing
-                      //'!' + bower.directory + '/rs-*/**/*.routes.js',
+                      //'!' + bower.directory + '/rs-*/**/*.states.js',
                       '!' + bower.directory + '/rs-*/**/*.spec.js',
                       '!' + bower.directory + '/rs-*/**/vendor_config.js'],
             styles: [bower.directory + '/rs-*/**/main.less'],
@@ -112,6 +135,14 @@ gulp.task('aggregate-vendor-deps', function () {
         config.dependencies = resources;
 
         config.aggregated = {
+            assets: _.uniq(_.flatten([
+                config.dependencies.assets,
+                _.map(vendorConfig.assets, function (asset) {
+                                            return bower.directory + '/**/' + asset;
+                }),
+                config.paths.app.assets,
+                config.paths.rscomponents.assets
+            ])),
             styles: _.uniq(_.flatten([
                 config.dependencies.styles,
                 _.map(vendorConfig.styles, function (style) {
@@ -128,14 +159,14 @@ gulp.task('aggregate-vendor-deps', function () {
                 config.paths.rscomponents.scripts,
                 config.paths.app.scripts
             ])),
-            assets: _.uniq(_.flatten([
-                config.dependencies.assets,
-                _.map(vendorConfig.assets, function (asset) {
-                                            return bower.directory + '/**/' + asset;
+            testScripts: _.uniq(_.flatten([
+                config.dependencies.scripts,
+                _.map(vendorConfig.scripts, function (script) {
+                                            return bower.directory + '/**/' + script;
                 }),
-                config.paths.app.assets,
-                config.paths.rscomponents.assets
-            ]))
+                bower.directory + '/angular-mocks/angular-mocks.js',
+                config.paths.app.testScripts
+            ])),
         };
 
     });
@@ -145,7 +176,7 @@ gulp.task('html2js', ['clean', 'aggregate-vendor-deps'], function () {
 
   gulp.src(_.flatten([config.paths.app.templates,
                       config.paths.placeholder.template]))
-      .pipe(nghtml2js({moduleName: 'templates-app'}))
+      .pipe($.ngHtml2js({moduleName: 'templates-app'}))
       .pipe($.concat('templates-app.js'))
       .pipe(gulp.dest(path.join(
         config.paths.build.tmp,
@@ -154,7 +185,7 @@ gulp.task('html2js', ['clean', 'aggregate-vendor-deps'], function () {
 
   gulp.src(_.flatten([config.paths.rscomponents.templates,
                       config.paths.placeholder.template]))
-      .pipe(nghtml2js({
+      .pipe($.ngHtml2js({
         moduleName: 'templates-components',
         rename: function(url) {
           return url.replace(/^.*src\/app\//, '');
@@ -180,31 +211,31 @@ gulp.task('scripts:lint', function () {
 });
 
 gulp.task('scripts', ['clean', 'aggregate-vendor-deps', 'scripts:lint'], function () {
-
   var stream = streamqueue({objectMode: true});
 
   stream.queue(gulp.src(config.aggregated.scripts));
-  stream.queue(gulp.src(config.paths.container.scripts));
+  stream.queue(gulp.src(config.paths.container.scripts)
+                   .pipe($.template({containerConfig: JSON.stringify(containerConfig)})));
 
-  return stream.done().pipe($.concat('app.js'))
-               .pipe($.insert.prepend('var _containerCfg = ' +
-                                      JSON.stringify(containerConfig) + ';'))
+  return stream.done()
+               .pipe($.concat(pkg.name + '.' + pkg.version + '.js'))
+               .pipe($.insert.prepend(config.banner))
                .pipe(gulp.dest(path.join(
                  config.paths.build.tmp,
                  config.paths.build.scripts
-               )))
-               .pipe($.connect.reload());
+               )));
 });
 
 gulp.task('scripts:dist', ['scripts', 'html2js'], function () {
   var srcPath = path.join(config.paths.build.tmp, config.paths.build.scripts);
   var output = gulp.src([
-                        path.join(srcPath, 'app.js'),
+                        path.join(srcPath, pkg.name + '.' + pkg.version + '.js'),
                         path.join(srcPath, 'templates-app.js'),
                         path.join(srcPath, 'templates-components.js')
                     ])
-                   .pipe($.concat('app.js'))
+                   .pipe($.concat(pkg.name + '.' + pkg.version + '.js'))
                    .pipe($.uglify())
+                   .pipe($.insert.prepend(config.banner))
                    .pipe(gulp.dest(path.join(
                             config.paths.build.dist,
                             config.paths.build.scripts
@@ -247,12 +278,12 @@ gulp.task('styles', ['clean', 'aggregate-vendor-deps'], function () {
 
     return stream.done()
                  .pipe($.less())
-                 .pipe($.concat('app.css'))
+                 .pipe($.concat( pkg.name + '.' + pkg.version + '.css'))
+                 .pipe($.insert.prepend(config.banner))
                  .pipe($.autoprefixer('last 1 version'))
                  .pipe(gulp.dest(path.join(
                     config.paths.build.tmp, config.paths.build.styles
-                 )))
-                 .pipe($.connect.reload());
+                 )));
 
 });
 
@@ -261,7 +292,9 @@ gulp.task('styles:dist', ['styles'], function () {
                             config.paths.build.tmp,
                             config.paths.build.styles, '*.css'
                         ))
-                   .pipe(minifyCss({compatibility: 'ie8'}))
+                   .pipe($.minifyCss({keepSpecialComments: 0,
+                                      compatibility: 'ie8'}))
+                   .pipe($.insert.prepend(config.banner))
                    .pipe(gulp.dest(path.join(
                                         config.paths.build.dist,
                                         config.paths.build.styles
@@ -281,7 +314,128 @@ gulp.task('assets:copy', ['clean', 'aggregate-vendor-deps'], function () {
 gulp.task('assets:copy-dist', ['clean', 'aggregate-vendor-deps'], function () {
     return gulp.src(config.aggregated.assets)
                .pipe(gulp.dest(path.join(
-                    config.paths.build.tmp,
+                    config.paths.build.dist,
                     config.paths.build.assets
                 )));
+});
+
+var templateIndex = function (cwd) {
+    var jsRoute = "scripts/*.js";
+    var cssRoute = "styles/*.css";
+    var includeJs = [];
+    var includeCss = [];
+
+    var jsPaths = glob.sync(jsRoute, {cwd: cwd, mark: true});
+    _.each(jsPaths, function (item) { includeJs.push('/' + item); });
+
+    var cssPaths = glob.sync(cssRoute, {cwd: cwd, mark: true});
+    _.each(cssPaths, function (item) { includeCss.push('/' + item); });
+
+    return {
+        author: pkg.author,
+        date: new Date().getFullYear(),
+        scripts: _.flatten(includeJs),
+        styles: _.flatten(includeCss),
+        version: pkg.version
+    };
+};
+
+gulp.task('index', ['html2js', 'scripts', 'styles'], function () {
+    var output = gulp.src('./src/app/index.html')
+                     .pipe($.template(templateIndex(config.paths.build.tmp)))
+                     .pipe(gulp.dest(config.paths.build.tmp))
+                     .pipe($.connect.reload());
+
+    output.on('error', console.error.bind(console));
+    return output;
+});
+
+gulp.task('index:dist', ['html2js', 'scripts:dist', 'styles:dist'], function () {
+    var output = gulp.src('./src/app/dist.html')
+                     .pipe($.rename('index.html'))
+                     .pipe($.template(templateIndex(config.paths.build.dist)))
+                     .pipe(gulp.dest(config.paths.build.dist));
+
+    output.on('error', console.error.bind(console));
+    return output;
+});
+
+gulp.task('build', ['assets:copy', 'index']);
+
+gulp.task('build:dist', ['assets:copy-dist', 'index:dist']);
+
+var initConnect = function (cwd) {
+    $.connect.server({
+        root: cwd,
+        port: 9000,
+        livereload: true,
+        middleware: function (connect, options) {
+            return [
+                connectModRewrite([
+                    '!\\.?(js|css|html|eot|svg|ttf|woff|otf|css|png|jpg|git|ico) / [L]'
+                ]),
+            ];
+        }
+    });
+};
+
+gulp.task('connect', ['build'], function () {
+    initConnect(config.paths.build.tmp);
+});
+
+gulp.task('connect:dist', ['build:dist'], function () {
+    initConnect(config.paths.build.dist);
+});
+
+gulp.task('serve', ['connect'], function () {
+    opn('http://localhost:9000');
+});
+
+gulp.task('serve:dist', ['connect:dist'], function () {
+    opn('http://localhost:9000');
+});
+
+gulp.task('watch', ['serve'], function () {
+    $.watch(['src/**/*.js', 'src/**/*.less', 'src/**/*.html'],
+            {debounceDelay: 2000},
+            function () {
+                gulp.start('build');
+            });
+});
+
+gulp.task('test', ['aggregate-vendor-deps'], function () {
+  return gulp.src(config.aggregated.testScripts)
+             .pipe($.filelog())
+             .pipe($.karma({
+                configFile: 'karma.conf.js',
+                action: 'run'
+             }))
+             .on('error', function (err) {
+                throw err;
+             });
+});
+
+gulp.task('bump', function () {
+    if (!argv.type) {
+        console.log('ERROR: No semver type specified. Use `gulp bump --type ' +
+                    '<patch | minor | major>');
+        return;
+    }
+
+    if (_.indexOf(['patch', 'minor', 'major'], argv.type) < 0) {
+        console.log('ERROR: Invalid semver type. Use `gulp bump --type ' +
+                    '<patch | minor | major>');
+        return;
+    }
+
+    var importance = argv.type;
+
+    var newVer = semver.inc(pkg.version, importance);
+
+    return gulp.src(['./package.json', './bower.json'])
+               .pipe($.bump({version: newVer}))
+               .pipe(gulp.dest('./'))
+               .pipe($.git.commit('bump package version to ' + newVer))
+               .pipe($.git.tag(newVer, 'bump package version to ' + newVer,
+                               function (err) {}));
 });

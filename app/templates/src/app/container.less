@@ -20,9 +20,15 @@
 .navbar-static-top {
     margin-bottom: 0;
     border-bottom: 1px solid #1265ab;
+
+    .navbar-nav {
+        .active {
+            background-color: @gray-lighter;
+        }
+    }
 }
 
-.{{= hypModuleName }}-container-root {
+.{= hypModuleName }}-container-root {
     .hero {
         background-color: @brand-primary;
         color: #7eb1dc;

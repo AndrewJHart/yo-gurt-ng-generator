@@ -2,14 +2,14 @@
       ng-app="{{= dotModuleName }}.container"
       ng-controller="{{= dotModuleName }}.container.AppCtrl">
     <head>
-        <title ng-bind="title">{{= dotModuleName }}</title>
+        <title ng-bind="title"></title>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <!-- compiled CSS --><% if(styles) styles.forEach( function ( file ) { %>
+        <!-- compiled CSS --><% styles.forEach( function ( file ) { %>
         <link rel="stylesheet" type="text/css" href="<%= file %>" /><% }); %>
-        <!-- compiled JavaScript --><% if(scripts) scripts.forEach( function ( file ) { %>
+        <!-- compiled JavaScript --><% scripts.forEach( function ( file ) { %>
         <script type="text/javascript" src="<%= file %>"></script><% }); %>
         <base href="/" />
     </head>
@@ -32,8 +32,12 @@
                 </div><!-- .navbar-header -->
                 <nav id="bs-navbar" class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a ui-sref="parent">Home</a></li>
-                        <li><a ui-sref="base-ng-proj">Main</a></li>
+                        <li ui-sref-active="active">
+                            <a ui-sref="parent">Home</a>
+                        </li>
+                        <li ui-sref-active="active">
+                            <a ui-sref="{{= hypModuleName }}">Main</a>
+                        </li>
                     </ul>
                 </nav><!-- #bs-navbar -->
             </div><!-- .container -->
