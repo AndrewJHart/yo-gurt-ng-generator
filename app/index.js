@@ -276,7 +276,7 @@ module.exports = yeoman.generators.Base.extend({
                     'src/app/'
                     +this.hypModuleName
                     +'/'
-                    +this.dotModuleName
+                    +this.hypModuleName
                     +'.ctrl'
                     +this.moduleSuffix),
                 this,
@@ -289,7 +289,7 @@ module.exports = yeoman.generators.Base.extend({
                     'src/app/'
                     +this.hypModuleName
                     +'/'
-                    +this.dotModuleName
+                    +this.hypModuleName
                     +'.module'
                     +this.moduleSuffix),
                 this,
@@ -302,7 +302,7 @@ module.exports = yeoman.generators.Base.extend({
                     'src/app/'
                     +this.hypModuleName
                     +'/'
-                    +this.dotModuleName
+                    +this.hypModuleName
                     +'.states'
                     +this.moduleSuffix),
                 this,
@@ -315,7 +315,7 @@ module.exports = yeoman.generators.Base.extend({
                     'src/app/'
                     +this.hypModuleName
                     +'/'
-                    +this.dotModuleName
+                    +this.hypModuleName
                     +'.spec'
                     +this.moduleSuffix),
                 this,
@@ -339,7 +339,7 @@ module.exports = yeoman.generators.Base.extend({
                     'src/app/'
                     +this.hypModuleName
                     +'/'
-                    +this.dotModuleName
+                    +this.hypModuleName
                     +'.tpl.html'),
                 this
             );
