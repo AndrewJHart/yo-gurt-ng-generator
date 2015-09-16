@@ -21,7 +21,7 @@ module.exports = yeoman.generators.Base.extend({
     interpolateMix: {
         evaluate: /\<\%([\s\S]+?)\%\>/g,
         interpolate: /\{\{=([\s\S]+?)\}\}/g,
-     },
+    },
 
     constructor: function() {
         yeoman.generators.Base.apply(this, arguments);

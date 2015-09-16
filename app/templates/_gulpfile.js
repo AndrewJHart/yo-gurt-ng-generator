@@ -135,7 +135,7 @@ gulp.task('aggregate-vendor-deps', function () {
         config.dependencies = resources;
 
         config.aggregated = {
-            assets: _.uniq(_.flatten([
+            assets: _.uniq(_.flattenDeep([
                 config.dependencies.assets,
                 _.map(vendorConfig.assets, function (asset) {
                                             return bower.directory + '/**/' + asset;
@@ -143,7 +143,7 @@ gulp.task('aggregate-vendor-deps', function () {
                 config.paths.app.assets,
                 config.paths.rscomponents.assets
             ])),
-            styles: _.uniq(_.flatten([
+            styles: _.uniq(_.flattenDeep([
                 config.dependencies.styles,
                 _.map(vendorConfig.styles, function (style) {
                                             return bower.directory + '/**/' + style;
@@ -151,7 +151,7 @@ gulp.task('aggregate-vendor-deps', function () {
                 config.paths.rscomponents.styles,
                 config.paths.app.styles
             ])),
-            scripts: _.uniq(_.flatten([
+            scripts: _.uniq(_.flattenDeep([
                 config.dependencies.scripts,
                 _.map(vendorConfig.scripts, function (script) {
                                             return bower.directory + '/**/' + script;
@@ -159,7 +159,7 @@ gulp.task('aggregate-vendor-deps', function () {
                 config.paths.rscomponents.scripts,
                 config.paths.app.scripts
             ])),
-            testScripts: _.uniq(_.flatten([
+            testScripts: _.uniq(_.flattenDeep([
                 config.dependencies.scripts,
                 _.map(vendorConfig.scripts, function (script) {
                                             return bower.directory + '/**/' + script;
