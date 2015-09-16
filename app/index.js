@@ -192,10 +192,11 @@ module.exports = yeoman.generators.Base.extend({
                 this.destinationPath('vendor_config.js')
             );
 
-            this.fs.copy(
-                this.templatePath('_jshintrc'),
-                this.destinationPath('.jshintrc')
-            );
+            // removed jshint - not sure if this is final
+            // this.fs.copy(
+            //     this.templatePath('_jshintrc'),
+            //     this.destinationPath('.jshintrc')
+            // );
 
             this.template(
               this.templatePath('_bowerrc'),    // src path
