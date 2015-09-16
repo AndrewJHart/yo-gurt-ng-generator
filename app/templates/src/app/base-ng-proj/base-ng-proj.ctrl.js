@@ -1,4 +1,3 @@
-// {{= dotModuleName }} Controller
 angular.module('{{= dotModuleName }}')
 
 .controller('{{= dotModuleName }}.AppCtrl', ['$rootScope',
@@ -10,4 +9,4 @@ angular.module('{{= dotModuleName }}')
                   ' projects this module is included with';
 }])
 
-;
+;<% if (true) {} %>

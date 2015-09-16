@@ -1,4 +1,3 @@
-// {{= dotModuleName }} States
 angular.module('{{= dotModuleName }}')
 
 .config(['$stateProvider', function ($stateProvider) {
@@ -10,4 +9,4 @@ angular.module('{{= dotModuleName }}')
         });
 }])
 
-;
+;<% if (true) {} %>

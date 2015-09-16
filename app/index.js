@@ -14,15 +14,14 @@ module.exports = yeoman.generators.Base.extend({
     moduleSuffix: '.js',
     dotModuleName: '',
     hypModuleName: '',
-    // interpolation: {
-    //     evaluate: /\{\{([\s\S]+?)\}\}/g,
-    //     interpolate: /\{\{=([\s\S]+?)\}\}/g,
-    //     escape: /\{\{-([\s\S]+?)\}\}/g
-    // },
     interpolation: {
         evaluate: /{{([\s\S]+?)}}/g,
         interpolate: /{{=([\s\S]+?)}}/g
     },
+    interpolateMix: {
+        evaluate: /\<\%([\s\S]+?)\%\>/g,
+        interpolate: /\{\{=([\s\S]+?)\}\}/g,
+     },
 
     constructor: function() {
         yeoman.generators.Base.apply(this, arguments);
@@ -112,11 +111,6 @@ module.exports = yeoman.generators.Base.extend({
           this.moduleType = props.moduleType;
           this.moduleName = props.moduleName;
           this.finalModule = this.getModuleName()
-
-          // this.log("You chose " + props.moduleType);
-          // this.log("App Name " + this.appname);
-          // this.log("module Name " + this.moduleName);
-          // this.log("Final Module Output Name " + this.finalModule);
 
           done();
 
@@ -267,11 +261,6 @@ module.exports = yeoman.generators.Base.extend({
                 this.interpolation
             );
 
-            this.template(
-                this.templatePath('src/app/root.tpl.html'),
-                this.destinationPath('src/app/root.tpl.html'),
-                this
-            );
 
             // copy files from `base-ng-proj` to nested module
             this.template(
@@ -284,7 +273,7 @@ module.exports = yeoman.generators.Base.extend({
                     +'.ctrl'
                     +this.moduleSuffix),
                 this,
-                this.interpolation
+                this.interpolateMix
             );
 
             this.template(
@@ -297,7 +286,7 @@ module.exports = yeoman.generators.Base.extend({
                     +'.module'
                     +this.moduleSuffix),
                 this,
-                this.interpolation
+                this.interpolateMix
             );
 
             this.template(
@@ -310,7 +299,7 @@ module.exports = yeoman.generators.Base.extend({
                     +'.states'
                     +this.moduleSuffix),
                 this,
-                this.interpolation
+                this.interpolateMix
             );
 
             this.template(
@@ -323,16 +312,7 @@ module.exports = yeoman.generators.Base.extend({
                     +'.spec'
                     +this.moduleSuffix),
                 this,
-                this.interpolation
-            );
-
-            this.fs.copy(
-                this.templatePath('src/app/base-ng-proj/main.less'),
-                this.destinationPath(
-                    'src/app/'
-                    +this.hypModuleName
-                    +'/'
-                    +'main.less')
+                this.interpolateMix
             );
 
             // revert to default ejs interpolation for this specific template
@@ -348,24 +328,26 @@ module.exports = yeoman.generators.Base.extend({
                 this
             );
 
+            this.fs.copy(
+                this.templatePath('src/app/base-ng-proj/main.less'),
+                this.destinationPath(
+                    'src/app/'
+                    +this.hypModuleName
+                    +'/'
+                    +'main.less')
+            );
+
             // copy empty template
             this.fs.copy(
                 this.templatePath('src/_blank.tpl.html'),
                 this.destinationPath('src/blank.tpl.html')
             );
 
-            // mkdir success move on with following ops
-            // copy the app dir & template files in it
-            // this.directory(
-            //     this.templatePath('src/app'),
-            //     this.destinationPath('src/app')
-            // );
-
-            // copy the entire root src dir & template it
-            // this.directory(
-            //     this.templatePath('src'),
-            //     this.destinationPath()
-            // );
+            this.template(
+                this.templatePath('src/app/root.tpl.html'),
+                this.destinationPath('src/app/root.tpl.html'),
+                this
+            );
         }
     },
 
@@ -375,42 +357,5 @@ module.exports = yeoman.generators.Base.extend({
         // Change working directory to 'src' for dependency install
         // this.spawnCommand("npm", ["install"], {cwd: 'src'});
         // this.spawnCommand("bower", ["install"], {cwd: 'src'});
-    },
-
-    // isPathAbsolute: function () {
-    //     var filepath = path.join.apply(path, arguments);
-    //     return path.resolve(filepath) === filepath;
-    // },
-
-    // // rewritten method for bulk copying with templating utilities & options
-    // // Shared directory method
-    // templateDiretory: function (source, destination, opts, process, bulk) {
-    //   // Only add sourceRoot if the path is not absolute
-    //   var root = this.isPathAbsolute(source) ? source : path.join(this.sourceRoot(), source),
-    //       files = glob.sync('**', { dot: true, nodir: true, cwd: root }),
-    //       options = opts || {};
-
-    //   destination = destination || source;
-
-    //   if (typeof destination === 'function') {
-    //     process = destination;
-    //     destination = source;
-    //   }
-
-    //   this.log('Triggered template dir with options... '+options);
-
-    //   var cp = this.copy;
-
-    //   if (bulk) {
-    //     cp = this.bulkCopy;
-    //   }
-
-    //   // get the path relative to the template root, and copy to the relative destination
-    //   for (var i in files) {
-    //     var dest = path.join(destination, files[i]);
-    //     cp.call(this, path.join(root, files[i]), dest, process);
-    //   }
-
-    //   return this;
-    // }
+    }
 });

@@ -18,5 +18,5 @@ describe('{{= dotModuleName }}.AppCtrl', function(){
 
     expect(scope.note.length > 0).toBeTruthy();
   }));
-});
+});<% if (true) {} %>
 
