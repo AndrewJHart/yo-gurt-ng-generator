@@ -14,10 +14,14 @@ module.exports = yeoman.generators.Base.extend({
     moduleSuffix: '.js',
     dotModuleName: '',
     hypModuleName: '',
+    // interpolation: {
+    //     evaluate: /\{\{([\s\S]+?)\}\}/g,
+    //     interpolate: /\{\{=([\s\S]+?)\}\}/g,
+    //     escape: /\{\{-([\s\S]+?)\}\}/g
+    // },
     interpolation: {
-        evaluate: /\{\{([\s\S]+?)\}\}/g,
-        interpolate: /\{\{=([\s\S]+?)\}\}/g,
-        escape: /\{\{-([\s\S]+?)\}\}/g
+        evaluate: /{{([\s\S]+?)}}/g,
+        interpolate: /{{=([\s\S]+?)}}/g
     },
 
     constructor: function() {

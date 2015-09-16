@@ -20,4 +20,3 @@ describe('{{= dotModuleName }}.AppCtrl', function(){
   }));
 });
 
-// <%= %>
