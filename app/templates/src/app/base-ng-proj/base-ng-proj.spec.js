@@ -18,5 +18,15 @@ describe('{{= dotModuleName }}.AppCtrl', function(){
 
     expect(scope.note.length > 0).toBeTruthy();
   }));
+
+  it('should have the same name as the yeoman injected module', inject(function($controller) {
+    $controller('{{= dotModuleName }}.AppCtrl', {
+      $scope: scope
+    });
+
+    console.log($controller.constructor.name);
+
+    expect($controller.constructor.name).toEqual('AppCtrl');
+  }));
 });<% if (true) {} %>
 

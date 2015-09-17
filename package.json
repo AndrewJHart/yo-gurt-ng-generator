@@ -1,6 +1,6 @@
 {
   "name": "generator-rs-angular",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Yeoman generator",
   "license": "MIT",
   "main": "app/index.js",
@@ -29,10 +29,10 @@
     "wiredep": "2.2.0"
   },
   "devDependencies": {
-    "glob": "^5.0.14",
-    "mkdirp": "^0.5.1",
-    "mkdirp-promise": "^1.0.3",
+    "glob": "5.0.14",
+    "mkdirp": "0.5.1",
+    "mkdirp-promise": "1.0.3",
     "mocha": "*",
-    "underscore.string": "^3.0.3"
+    "underscore.string": "3.0.3"
   }
 }

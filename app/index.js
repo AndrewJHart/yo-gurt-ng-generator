@@ -18,6 +18,11 @@ module.exports = yeoman.generators.Base.extend({
         evaluate: /{{([\s\S]+?)}}/g,
         interpolate: /{{=([\s\S]+?)}}/g
     },
+    // Secondary interpolation & eval template options required
+    // due to bug in yeoman generator.template() method. Using
+    // different settings works fine until the templates are
+    // nested in directory structure - then the bug prevents
+    //
     interpolateMix: {
         evaluate: /\<\%([\s\S]+?)\%\>/g,
         interpolate: /\{\{=([\s\S]+?)\}\}/g,
@@ -49,8 +54,8 @@ module.exports = yeoman.generators.Base.extend({
         }
 
         this.appPath = this.env.options.appPath;
-        this.ngVer = '1.4.0';  // currently used for ng-mocks version in bower
-        this.version = '0.1.0';
+        // this.ngVer = '1.4.0';  // currently used for ng-mocks version in bower
+        // this.version = '0.1.0';
     },
 
     ask: function () {
@@ -172,6 +177,7 @@ module.exports = yeoman.generators.Base.extend({
 
     writing: {
         root: function () {
+            // template root project files first
             this.fs.copy(
                 this.templatePath('_config.json'),
                 this.destinationPath('config.json')
@@ -192,16 +198,10 @@ module.exports = yeoman.generators.Base.extend({
                 this.destinationPath('vendor_config.js')
             );
 
-            // removed jshint - not sure if this is final
-            // this.fs.copy(
-            //     this.templatePath('_jshintrc'),
-            //     this.destinationPath('.jshintrc')
-            // );
-
             this.template(
-              this.templatePath('_bowerrc'),    // src path
+              this.templatePath('_bowerrc'),     // src path
               this.destinationPath('.bowerrc'),  // target path
-              this                                 // template context
+              this                               // template context
             );
 
             this.template(
@@ -221,11 +221,11 @@ module.exports = yeoman.generators.Base.extend({
                 this.destinationPath('karma.conf.js'),
                 this
             );
-
+            // end templating of root files
         },
 
         app: function () {
-            // copy index.html first to force interpolation
+            // copy & eval index.html first
             this.template(
                 this.templatePath('src/app/index.html'),
                 this.destinationPath('src/app/index.html'),
@@ -236,10 +236,12 @@ module.exports = yeoman.generators.Base.extend({
             // make the new dir to place base-ng-proj files
             mkdirp(this.destinationPath('src/app/')+this.hypModuleName)
                 .catch(function(err) {
+                    // gracefully error out, log it & quit
                     this.env.error(err);
                 });
 
-            // generate templates for src dir
+            // generate & template files for src dir
+            // that require evaluation & interpolation
             this.template(
                 this.templatePath('src/app/container.less'),
                 this.destinationPath('src/app/container.less'),
@@ -254,7 +256,6 @@ module.exports = yeoman.generators.Base.extend({
                 this.interpolation
             );
 
-            // just copy the dist.html directly
             this.template(
                 this.templatePath('src/app/dist.html'),
                 this.destinationPath('src/app/dist.html'),
@@ -262,8 +263,7 @@ module.exports = yeoman.generators.Base.extend({
                 this.interpolation
             );
 
-
-            // copy files from `base-ng-proj` to nested module
+            // template files from `base-ng-proj` to nested module
             this.template(
                 this.templatePath('src/app/base-ng-proj/base-ng-proj.ctrl.js'),
                 this.destinationPath(
@@ -317,7 +317,6 @@ module.exports = yeoman.generators.Base.extend({
             );
 
             // revert to default ejs interpolation for this specific template
-            // this.note = '{{- note }}';
             this.template(
                 this.templatePath('src/app/base-ng-proj/base-ng-proj.tpl.html'),
                 this.destinationPath(
@@ -329,6 +328,14 @@ module.exports = yeoman.generators.Base.extend({
                 this
             );
 
+            this.template(
+                this.templatePath('src/app/root.tpl.html'),
+                this.destinationPath('src/app/root.tpl.html'),
+                this
+            );
+            // end of template method invocations
+
+            // begin standard copy ops for files that dont need interpolation
             this.fs.copy(
                 this.templatePath('src/app/base-ng-proj/main.less'),
                 this.destinationPath(
@@ -338,25 +345,15 @@ module.exports = yeoman.generators.Base.extend({
                     +'main.less')
             );
 
-            // copy empty template
             this.fs.copy(
                 this.templatePath('src/_blank.tpl.html'),
                 this.destinationPath('src/blank.tpl.html')
             );
-
-            this.template(
-                this.templatePath('src/app/root.tpl.html'),
-                this.destinationPath('src/app/root.tpl.html'),
-                this
-            );
+            // end of copy operations
         }
     },
 
     install: function() {
         this.installDependencies();
-
-        // Change working directory to 'src' for dependency install
-        // this.spawnCommand("npm", ["install"], {cwd: 'src'});
-        // this.spawnCommand("bower", ["install"], {cwd: 'src'});
     }
 });

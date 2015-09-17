@@ -1,9 +1,9 @@
 'use strict';
 var path = require('path');
-var yeoman = require('yeoman-generator');
-var angularUtils = require('./util.js');
-var chalk = require('chalk');
-var _ = require('underscore.string');
+    yeoman = require('yeoman-generator'),
+    angularUtils = require('./util.js'),
+    chalk = require('chalk'),
+    _ = require('underscore.string');
 
 /**
  * Scaffold Generator base class extends yeoman NamedBase for generating
@@ -11,6 +11,7 @@ var _ = require('underscore.string');
  * creating the modules & tests.
  */
 var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
+  // @TODO: move these into config file or yo-rc.json
   _sourceFilePath: 'app/templates/modules/',
   _targetFilePath: 'app/',
   _scriptSuffix: '.js',
@@ -20,6 +21,10 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
 
     // trigger super constructor
     yeoman.generators.NamedBase.apply(this, arguments);
+
+    this.argument('directory', { type: String, required: false });
+
+    // @TODO: insert logic for checking `directory` argument is valid
 
     try {
       bowerJson = require(path.join(process.cwd(), 'bower.json'));
@@ -73,8 +78,9 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
 
   addScriptToIndex: function(script) {
     try {
-      var appPath = this.env.options.appPath;
-      var fullPath = path.join(appPath, 'index.html');
+      var appPath = this.env.options.appPath,
+          fullPath = path.join(appPath, 'index.html');
+
       angularUtils.rewriteFile({
         file: fullPath,
         needle: '<!-- endbuild -->',
@@ -83,6 +89,8 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
         ]
       });
     } catch (e) {
+      // log error message to interface. Consider actually stopping operations
+      // gracefully by using generator.env.error() which logs & gracefully exits
       this.log.error(chalk.yellow(
         '\nUnable to find ' + fullPath + '. Reference to ' + script + '.js ' + 'not added.\n'
       ));
