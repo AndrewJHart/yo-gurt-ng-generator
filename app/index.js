@@ -224,6 +224,14 @@ module.exports = yeoman.generators.Base.extend({
             // end templating of root files
         },
 
+        tempDirCopy: function () {
+            // test that directory method is templating files
+            this.templateMany(
+                this.templatePath('src/app/base-ng-proj/*'),
+                this.destinationPath('src/*')
+            );
+        },
+
         app: function () {
             // copy & eval index.html first
             this.template(
@@ -355,5 +363,47 @@ module.exports = yeoman.generators.Base.extend({
 
     install: function() {
         this.installDependencies();
+    },
+
+    // Shared directory method
+    _templateDirectory: function (source, destination, process, bulk) {
+        // Only add sourceRoot if the path is not absolute
+        var root = this.templatePath(source);
+        var files = glob.sync('**', { dot: true, nodir: true, cwd: root });
+
+        destination = destination || source;
+
+        if (typeof destination === 'function') {
+            process = destination;
+            destination = source;
+        }
+
+        var cp = this.copy;
+
+        if (bulk) {
+            cp = this.bulkCopy;
+        }
+
+        // get the path relative to the template root, and copy to the relative destination
+        for (var i in files) {
+            var dest = path.join(destination, files[i]);
+            cp.call(this, path.join(root, files[i]), dest, process);
+        }
+
+        return this;
+    },
+
+    /**
+     * Copies recursively the files from source directory to root directory.
+     *
+     * @param {String} source      Source directory to copy from. Relative to this.sourceRoot()
+     * @param {String} destination Directory to copy the source files into. Relative to this.destinationRoot().
+     * @param {Function} process Receive in order: the body, the source path, the destination
+     *                           path and a list of options containing the encoding. It should
+     *                           return the new body.
+     */
+    templateMany: function (source, destination, process) {
+        this.log('templateMany Called');
+        return this._templateDirectory(source, destination, process);
     }
 });

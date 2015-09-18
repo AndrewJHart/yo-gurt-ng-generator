@@ -9,7 +9,7 @@ var path = require('path'),
 /**
  * Subclass of ScaffoldGenerator for creating routes
  */
-var DirectiveGenerator = module.exports = ScaffoldGenerator.extend({
+var RouteGenerator = module.exports = ScaffoldGenerator.extend({
   constructor: function() {
     ScaffoldGenerator.apply(this, arguments);
 
@@ -31,7 +31,6 @@ var DirectiveGenerator = module.exports = ScaffoldGenerator.extend({
       this.foundWhenForRoute = true;
     }
 
-    // hookFor is deprecated for composeWith - todo
     this.hookFor('rs-angular:controller');
     this.hookFor('rs-angular:view');
   },
