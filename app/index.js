@@ -6,8 +6,7 @@ var yeoman = require('yeoman-generator'),
     glob   = require('glob'),
     _      = require('underscore.string'),
     mkdirp = require('mkdirp-promise'),
-    angularUtils = require('../util');
-
+    utils  = require('../util');
 
 module.exports = yeoman.generators.Base.extend({
     modulePrefix: 'rs',
@@ -19,10 +18,9 @@ module.exports = yeoman.generators.Base.extend({
         interpolate: /{{=([\s\S]+?)}}/g
     },
     // Secondary interpolation & eval template options required
-    // due to bug in yeoman generator.template() method. Using
-    // different settings works fine until the templates are
-    // nested in directory structure - then the bug prevents
-    //
+    // as workaround to a bug that prevents template from rendering
+    // with custom settings unless it has at least one <%= %> entry
+    // https://github.com/yeoman/generator/issues/517
     interpolateMix: {
         evaluate: /\<\%([\s\S]+?)\%\>/g,
         interpolate: /\{\{=([\s\S]+?)\}\}/g,
@@ -30,11 +28,12 @@ module.exports = yeoman.generators.Base.extend({
 
     constructor: function() {
         yeoman.generators.Base.apply(this, arguments);
+
         this.argument('appname', { type: String, required: true });
 
         this.appname = this.appname || path.basename(process.cwd());
         this.appname = _.camelize(_.slugify(_.humanize(this.appname)));
-        this.scriptAppName = this.appname + angularUtils.appName(this);
+        this.scriptAppName = this.appname + utils.appName(this);
 
         if (typeof this.env.options.appPath === 'undefined') {
           this.option('appPath', {
@@ -54,8 +53,6 @@ module.exports = yeoman.generators.Base.extend({
         }
 
         this.appPath = this.env.options.appPath;
-        // this.ngVer = '1.4.0';  // currently used for ng-mocks version in bower
-        // this.version = '0.1.0';
     },
 
     ask: function () {
@@ -125,6 +122,7 @@ module.exports = yeoman.generators.Base.extend({
     confirm: function () {
         var done = this.async();
 
+        // prompt options
         var prompts = [{
           type: 'confirm',
           name: 'confirm',
@@ -132,6 +130,7 @@ module.exports = yeoman.generators.Base.extend({
           default: true
         }];
 
+        // present user with a prompt & store response
         this.prompt(prompts, function (props) {
             if (props.confirm) {
                 // update the module name prop
@@ -145,11 +144,23 @@ module.exports = yeoman.generators.Base.extend({
         }.bind(this));
     },
 
+    /**
+     * Simple getter returns bool based on type of module we are building
+     *
+     * @return {Boolean} returns true or false based on previous user input
+     */
     isCustom: function () {
-        // quick getter returns bool based on type of module
         return this.moduleType === 'custom' ? true : false;
     },
 
+    /**
+     * Constructs a namespaced module name based on the inputs provided
+     * by the user in the previous prompts. Can take an optional `separator`
+     * for use in outputting the name - defaults to `.` if none is provided.
+     *
+     * @param  {String} separator type of char or string used as separator for output
+     * @return {String}           returns fully namespaced module name per rS spec
+     */
     getModuleName: function (separator) {
         var out;
 
@@ -169,7 +180,6 @@ module.exports = yeoman.generators.Base.extend({
                   +this.moduleType
                   +separator
                   +this.moduleName;
-                  //+this.moduleSuffix;
         }
 
         return out;
@@ -222,14 +232,6 @@ module.exports = yeoman.generators.Base.extend({
                 this
             );
             // end templating of root files
-        },
-
-        tempDirCopy: function () {
-            // test that directory method is templating files
-            this.templateMany(
-                this.templatePath('src/app/base-ng-proj/*'),
-                this.destinationPath('src/*')
-            );
         },
 
         app: function () {
@@ -361,49 +363,11 @@ module.exports = yeoman.generators.Base.extend({
         }
     },
 
+    /**
+     * Automatically run bower install & npm install to install all
+     * dependencies after the generator has completed.
+     */
     install: function() {
         this.installDependencies();
-    },
-
-    // Shared directory method
-    _templateDirectory: function (source, destination, process, bulk) {
-        // Only add sourceRoot if the path is not absolute
-        var root = this.templatePath(source);
-        var files = glob.sync('**', { dot: true, nodir: true, cwd: root });
-
-        destination = destination || source;
-
-        if (typeof destination === 'function') {
-            process = destination;
-            destination = source;
-        }
-
-        var cp = this.copy;
-
-        if (bulk) {
-            cp = this.bulkCopy;
-        }
-
-        // get the path relative to the template root, and copy to the relative destination
-        for (var i in files) {
-            var dest = path.join(destination, files[i]);
-            cp.call(this, path.join(root, files[i]), dest, process);
-        }
-
-        return this;
-    },
-
-    /**
-     * Copies recursively the files from source directory to root directory.
-     *
-     * @param {String} source      Source directory to copy from. Relative to this.sourceRoot()
-     * @param {String} destination Directory to copy the source files into. Relative to this.destinationRoot().
-     * @param {Function} process Receive in order: the body, the source path, the destination
-     *                           path and a list of options containing the encoding. It should
-     *                           return the new body.
-     */
-    templateMany: function (source, destination, process) {
-        this.log('templateMany Called');
-        return this._templateDirectory(source, destination, process);
     }
 });

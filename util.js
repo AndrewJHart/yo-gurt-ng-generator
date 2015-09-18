@@ -1,7 +1,12 @@
 'use strict';
-var path = require('path');
-var fs = require('fs');
-var _ = require('underscore.string');
+var path = require('path'),
+    fs = require('fs'),
+    _ = require('underscore.string');
+
+function isPathAbsolute() {
+  var filepath = path.join.apply(path, arguments);
+  return path.resolve(filepath) === filepath;
+}
 
 function escapeRegExp (str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
