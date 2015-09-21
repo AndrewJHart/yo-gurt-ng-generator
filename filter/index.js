@@ -1,5 +1,5 @@
 'use strict';
-var ScaffoldGenerator = require('../scaffold.js');
+var ScaffoldGenerator = require('../scaffold-base.js');
 
 var FilterGenerator = module.exports = ScaffoldGenerator.extend({
     constructor: function() {

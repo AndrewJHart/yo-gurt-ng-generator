@@ -73,9 +73,10 @@ function appName (self) {
   return suffix ? _.classify(suffix) : '';
 }
 
-
+// export the non-internal functions
 module.exports = {
   rewrite: rewrite,
   rewriteFile: rewriteFile,
-  appName: appName
+  appName: appName,
+  isPathAbsolute: isPathAbsolute
 };

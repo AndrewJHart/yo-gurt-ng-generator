@@ -3,37 +3,44 @@ var yeoman = require('yeoman-generator'),
     chalk  = require('chalk'),
     yosay  = require('yosay'),
     path   = require('path'),
-    glob   = require('glob'),
-    _      = require('underscore.string'),
+    _      = require('lodash'),
+    _str   = require('underscore.string'),
     mkdirp = require('mkdirp-promise'),
-    utils  = require('../util');
+    util   = require('../util'),
+    GeneratorMixin = require('../generator-mixin');
 
-module.exports = yeoman.generators.Base.extend({
-    modulePrefix: 'rs',
-    moduleSuffix: '.js',
-    dotModuleName: '',
-    hypModuleName: '',
-    interpolation: {
-        evaluate: /{{([\s\S]+?)}}/g,
-        interpolate: /{{=([\s\S]+?)}}/g
-    },
-    // Secondary interpolation & eval template options required
-    // as workaround to a bug that prevents template from rendering
-    // with custom settings unless it has at least one <%= %> entry
-    // https://github.com/yeoman/generator/issues/517
-    interpolateMix: {
-        evaluate: /\<\%([\s\S]+?)\%\>/g,
-        interpolate: /\{\{=([\s\S]+?)\}\}/g,
-    },
+/**
+ * The rewardStyle angular app & module generator
+ *
+ * Extends the yeoman `Base` object & mixes in our
+ * custom `generator-mixin` methods on the prototype.
+ * (mixin occurs at EOF)
+ *
+ * When run it will ask some basic questions & based
+ * on the user input do things such as:
+ *   create a safe, namespaced app / module name in
+ * form of `rs.{{module type}}.{{module/app name}}`
+ *   create the project, root project files, and the
+ * corresponding folders to match the project layout.
+ *   automatically inject the generated app / module
+ * name into the angular js files as modules
+ *   generate the remaining html & css files -
+ * injecting the app / module name into them.
+ *   copy any files with static content to target
+ */
+var rsGenerator = module.exports = yeoman.generators.Base.extend({
 
     constructor: function() {
+        // trigger the base class constructor
         yeoman.generators.Base.apply(this, arguments);
 
+        // configure a require command line argument `appname`
         this.argument('appname', { type: String, required: true });
 
+        // store the appname on instance & manipulate the string
         this.appname = this.appname || path.basename(process.cwd());
-        this.appname = _.camelize(_.slugify(_.humanize(this.appname)));
-        this.scriptAppName = this.appname + utils.appName(this);
+        this.appname = _str.camelize(_str.slugify(_str.humanize(this.appname)));
+        this.scriptAppName = this.appname + util.appName(this);
 
         if (typeof this.env.options.appPath === 'undefined') {
           this.option('appPath', {
@@ -144,47 +151,6 @@ module.exports = yeoman.generators.Base.extend({
         }.bind(this));
     },
 
-    /**
-     * Simple getter returns bool based on type of module we are building
-     *
-     * @return {Boolean} returns true or false based on previous user input
-     */
-    isCustom: function () {
-        return this.moduleType === 'custom' ? true : false;
-    },
-
-    /**
-     * Constructs a namespaced module name based on the inputs provided
-     * by the user in the previous prompts. Can take an optional `separator`
-     * for use in outputting the name - defaults to `.` if none is provided.
-     *
-     * @param  {String} separator type of char or string used as separator for output
-     * @return {String}           returns fully namespaced module name per rS spec
-     */
-    getModuleName: function (separator) {
-        var out;
-
-        if (!separator) {
-            separator = '.';  // default to dot notation if nothing passed
-        }
-
-        // check for custom module - has no type output
-        if (this.isCustom()) {
-            out = this.modulePrefix
-                  +separator
-                  +this.moduleName;
-        } else {
-            // cat prefix, moduletype, & name for output
-            out = this.modulePrefix
-                  +separator
-                  +this.moduleType
-                  +separator
-                  +this.moduleName;
-        }
-
-        return out;
-    },
-
     writing: {
         root: function () {
             // template root project files first
@@ -240,10 +206,10 @@ module.exports = yeoman.generators.Base.extend({
                 this.templatePath('src/app/index.html'),
                 this.destinationPath('src/app/index.html'),
                 this,
-                this.interpolation
+                this.interpolate
             );
 
-            // make the new dir to place base-ng-proj files
+            // make the new dir to replace base-ng-proj files
             mkdirp(this.destinationPath('src/app/')+this.hypModuleName)
                 .catch(function(err) {
                     // gracefully error out, log it & quit
@@ -256,21 +222,21 @@ module.exports = yeoman.generators.Base.extend({
                 this.templatePath('src/app/container.less'),
                 this.destinationPath('src/app/container.less'),
                 this,
-                this.interpolation
+                this.interpolate
             );
 
             this.template(
                 this.templatePath('src/app/container.js'),
                 this.destinationPath('src/app/container.js'),
                 this,
-                this.interpolation
+                this.interpolate
             );
 
             this.template(
                 this.templatePath('src/app/dist.html'),
                 this.destinationPath('src/app/dist.html'),
                 this,
-                this.interpolation
+                this.interpolate
             );
 
             // template files from `base-ng-proj` to nested module
@@ -365,9 +331,12 @@ module.exports = yeoman.generators.Base.extend({
 
     /**
      * Automatically run bower install & npm install to install all
-     * dependencies after the generator has completed.
+     * dependencies after the generator has completed file ops.
      */
     install: function() {
         this.installDependencies();
     }
 });
+
+// mixin generator-mixin props onto this obj prototype
+_.extend(rsGenerator.prototype, GeneratorMixin);

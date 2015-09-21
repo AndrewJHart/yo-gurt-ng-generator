@@ -1,7 +1,7 @@
 'use strict';
-var path = require('path');
-var util = require('util');
-var yeoman = require('yeoman-generator');
+var path = require('path'),
+    util = require('util'),
+    yeoman = require('yeoman-generator');
 
 var ViewGenerator = module.exports = yeoman.generators.NamedBase.extend({
     _sourceViewPath: '../app/templates/modules/',

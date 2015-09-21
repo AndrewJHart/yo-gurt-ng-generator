@@ -2,7 +2,7 @@
 var path = require('path'),
     chalk = require('chalk'),
     util = require('util'),
-    ScaffoldGenerator = require('../scaffold.js'),
+    ScaffoldGenerator = require('../scaffold-base.js'),
     angularUtils = require('../util.js'),
     bower = require(path.join(process.cwd(), 'src/bower.json'));
 
