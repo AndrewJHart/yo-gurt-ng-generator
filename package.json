@@ -1,5 +1,5 @@
 {
-  "name": "angular-generator",
+  "name": "generator-rs-angular",
   "version": "1.0.0",
   "description": "rewardStyle Yeoman generator for angular projects",
   "license": "MIT",
