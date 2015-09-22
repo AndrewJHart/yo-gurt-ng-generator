@@ -6,9 +6,14 @@ var path = require('path');
     _ = require('underscore.string');
 
 /**
- * Scaffold Generator base class extends yeoman NamedBase for generating
- * files with a named option passed in. Used by each sub-generator for
- * creating the modules & tests.
+ * Scaffold Generator base class extends
+ * yeoman NamedBase for generating files with
+ * a named option passed in. Used by each
+ * sub-generator for scaffolding out the modules
+ * & tests.
+ *
+ * @author  Andrew Hart
+ * @type {object}
  */
 var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
   // @TODO: move these into config file or yo-rc.json
@@ -22,10 +27,14 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
     // trigger super constructor
     yeoman.generators.NamedBase.apply(this, arguments);
 
+    // if we make use of component layout then the sub-generator
+    // may require an output directory for the files that are generated.
+    // as override or option
     this.argument('directory', { type: String, required: false });
 
     // @TODO: insert logic for checking `directory` argument is valid
 
+    // load bower.json & look for name and path
     try {
       bowerJson = require(path.join(process.cwd(), 'bower.json'));
     } catch (e) {}
@@ -55,9 +64,20 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
 
     this.env.options.testPath = this.env.options.testPath || bowerJson.testPath || 'test/spec';
 
+    // set the default source root path in generator (used by yeoman)
     this.sourceRoot(path.join(__dirname, this._sourceFilePath));
   },
 
+  /**
+   * Takes `src` and `dest` params - copying and templating
+   * the source file with the context of the current generator.
+   *
+   * appTemplate delegates to `generators.Base.template()`
+   * calling it with the current context.
+   *
+   * @param  {String} src  path to source file for processing
+   * @param  {String} dest path to target for output
+   */
   appTemplate: function(src, dest) {
     yeoman.generators.Base.prototype.template.apply(this, [
       src + this._scriptSuffix,
@@ -65,10 +85,28 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
     ]);
   },
 
+  /**
+   * Takes `src` and `dest` params - generates a basic
+   * test prototype when scaffolding occurs.
+   *
+   * @param  {String} src  path to source file for processing
+   * @param  {String} dest path to target for output
+   */
   testTemplate: function(src, dest) {
-    // no-op -- TODO implementation
+    // @TODO: implement method for generating
+    // test files based on karma
   },
 
+ /**
+   * Takes `src` and `dest` params - copying and templating
+   * html files.
+   *
+   * appTemplate delegates to `generators.Base.template()`
+   * calling it with the current context.
+   *
+   * @param  {String} src  path to source file for processing
+   * @param  {String} dest path to target for output
+   */
   htmlTemplate: function(src, dest) {
     yeoman.generators.NamedBase.prototype.template.apply(this, [
       src,
@@ -76,6 +114,12 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
     ]);
   },
 
+  /**
+   * Takes the `script` name & injects the specified script
+   * into the index.html document as a new dependency
+   *
+   * @param {String} script  name of the script to be added
+   */
   addScriptToIndex: function(script) {
     try {
       var appPath = this.env.options.appPath,
@@ -97,6 +141,16 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
     }
   },
 
+  /**
+   * Accepts the `appTemplate` & `testTemplate` files and delegates
+   * to internal methods to copy & template these files into the
+   * `target` directory
+   *
+   * @param  {String} appTemplate     Source script file to render & copy
+   * @param  {String} testTemplate    Source test file to render & copy
+   * @param  {String} targetDirectory Destination for file output
+   * @param  {Boolean} skipAdd        If true skips adding the script to index.html
+   */
   generateSourceAndTest: function(appTemplate, testTemplate, targetDirectory, skipAdd) {
     // Services use classified names
     if (this.generatorName && this.generatorName.toLowerCase() === 'service') {

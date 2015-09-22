@@ -10,16 +10,23 @@ var path   = require('path'),
  * Should be added onto the prototype of any core
  * generator(s) that are or will be used in the project.
  *
- * note: this is not the base class for use in
- *   sub-generators (aka scaffolding). That object
- *   & those methods can be found `./scaffold.js`
+ * methods prefixed with an underscore `_` are not
+ * necessarily meant to be private but this keeps that
+ * method from being run automatically by the yeoman
+ * run loop.
  *
+ * note: this is not the base class for use in
+ *   sub-generators (scaffolding). That object
+ *   & those methods can be found `./scaffold-base.js`
+ *
+ * @author  Andrew Hart
  * @type {object}
  */
 var GeneratorMixin = module.exports = {
     // public member vars
     modulePrefix: 'rs',
     moduleSuffix: '.js',
+    moduleType:    '',
     dotModuleName: '',
     hypModuleName: '',
 
@@ -45,7 +52,7 @@ var GeneratorMixin = module.exports = {
      *
      * @return {Boolean} returns true or false based on user input at prompt
      */
-    isCustom: function () {
+    _isCustom: function () {
         return this.moduleType === 'custom' ? true : false;
     },
 
@@ -57,7 +64,7 @@ var GeneratorMixin = module.exports = {
      * @param  {String} separator type of char or string used as separator for output
      * @return {String}           returns fully namespaced module name per rS spec
      */
-    getModuleName: function (separator) {
+    _getModuleName: function (separator) {
         var out;
 
         if (!separator) {
@@ -65,7 +72,7 @@ var GeneratorMixin = module.exports = {
         }
 
         // check for custom module - has no type output
-        if (this.isCustom()) {
+        if (this._isCustom()) {
             out = this.modulePrefix
                   +separator
                   +this.moduleName;
@@ -92,7 +99,7 @@ var GeneratorMixin = module.exports = {
      * @param {object} ctx  Template context data { key: value } for rendering variables
      * @param {object} tplOpts Template options settings to pass to _.template() method
      */
-    templateMany: function (src, dest, ctx, tplOpts) {
+    _templateMany: function (src, dest, ctx, tplOpts) {
         var root = util.isPathAbsolute(src) ? src : path.join(this.sourceRoot(), src),
             files = glob.sync('**', { dot: true, nodir: true, cwd: root });
 
