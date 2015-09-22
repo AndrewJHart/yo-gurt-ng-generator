@@ -8,6 +8,20 @@ function isPathAbsolute() {
   return path.resolve(filepath) === filepath;
 }
 
+function deleteFolderRecursive (path) {
+  if( fs.existsSync(path) ) {
+    fs.readdirSync(path).forEach(function(file,index){
+      var curPath = path + "/" + file;
+      if(fs.lstatSync(curPath).isDirectory()) { // recurse
+        deleteFolderRecursive(curPath);
+      } else { // delete file
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(path);
+  }
+}
+
 function escapeRegExp (str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
 }
@@ -78,5 +92,6 @@ module.exports = {
   rewrite: rewrite,
   rewriteFile: rewriteFile,
   appName: appName,
-  isPathAbsolute: isPathAbsolute
+  isPathAbsolute: isPathAbsolute,
+  deleteFolderRecursive: deleteFolderRecursive
 };

@@ -11,8 +11,8 @@ var path   = require('path'),
  * generator(s) that are or will be used in the project.
  *
  * methods prefixed with an underscore `_` are not
- * necessarily meant to be private but this keeps that
- * method from being run automatically by the yeoman
+ * necessarily meant to be private but this keeps those
+ * methods from being run automatically by the yeoman
  * run loop.
  *
  * note: this is not the base class for use in

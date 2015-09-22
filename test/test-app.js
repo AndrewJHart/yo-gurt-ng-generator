@@ -4,6 +4,7 @@ var path = require('path'),
     assert = require('yeoman-assert'),
     helpers = require('yeoman-generator').test,
     os = require('os'),
+    util = require('../util'),
     rimraf = require('rimraf');
 
 /**
@@ -23,7 +24,6 @@ describe('rs-angular:app', function() {
             // use temp folder for testing
             .inDir(
               targetDir
-              // path.join(__dirname, './tmp')
             )
             // supply `appname` argument
             .withArguments(
@@ -39,19 +39,16 @@ describe('rs-angular:app', function() {
             )
             .on('end', function() {
               console.log('End of run. Cleaning up...');
-              console.log(process.cwd());
-              console.log(__dirname);
 
-              // cleanup the temp directory
-              process.chdir('/');
-              console.log(__dirname);
-              console.log(process.cwd());
-              rimraf(__dirname+'/tmp', function (err) {
-                if (err) {
-                  throw(err);
-                }
-              });
+              // cleanup the tmp directory
             });
+
+            // rimraf(targetDir, function (err) {
+            //   if (err) {
+            //     throw(err);
+            //   }
+            // });
+            util.deleteFolderRecursive(path.join(__dirname, './tmp/**'));
     });
 
     describe('Dependencies', function() {
