@@ -2,15 +2,15 @@
 
 var path = require('path'),
     assert = require('yeoman-assert'),
-    //assert = require('yeoman-generator').assert,
     helpers = require('yeoman-generator').test,
-    os = require('os');
+    os = require('os'),
+    rimraf = require('rimraf');
 
 /**
  * Unit tests for the core app generator
  */
 describe('rs-angular:app', function() {
-    var outDir = 'test/tmp/',
+    var targetDir   = path.join(__dirname, './tmp'),
         mockPrompts = {
           moduleName: 'testapp',
           moduleType: 'core',
@@ -22,7 +22,8 @@ describe('rs-angular:app', function() {
         helpers.run(path.join(__dirname, '../app'))
             // use temp folder for testing
             .inDir(
-              path.join(__dirname, './tmp')
+              targetDir
+              // path.join(__dirname, './tmp')
             )
             // supply `appname` argument
             .withArguments(
@@ -37,7 +38,19 @@ describe('rs-angular:app', function() {
               mockPrompts
             )
             .on('end', function() {
-              console.log('End of run statement');
+              console.log('End of run. Cleaning up...');
+              console.log(process.cwd());
+              console.log(__dirname);
+
+              // cleanup the temp directory
+              process.chdir('/');
+              console.log(__dirname);
+              console.log(process.cwd());
+              rimraf(__dirname+'/tmp', function (err) {
+                if (err) {
+                  throw(err);
+                }
+              });
             });
     });
 
@@ -54,11 +67,11 @@ describe('rs-angular:app', function() {
       it('generates expected root project files', function () {
         // assert the generated files were created
         assert.file([
-          path.join(__dirname, './tmp/')+'bower.json',
-          path.join(__dirname, './tmp/')+'package.json',
-          path.join(__dirname, './tmp/')+'gulpfile.js',
-          path.join(__dirname, './tmp/')+'vendor_config.js',
-          path.join(__dirname, './tmp/')+'karma.conf.js'
+          'bower.json',
+          'package.json',
+          'gulpfile.js',
+          'vendor_config.js',
+          'karma.conf.js'
         ]);
       });
     });
