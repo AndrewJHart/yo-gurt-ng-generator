@@ -29,7 +29,10 @@ var yeoman = require('yeoman-generator'),
  *   copy any files with static content to target
  */
 var rsGenerator = module.exports = yeoman.generators.Base.extend({
+    // instance props
+    appname: '',
     baseDir: process.cwd(),
+    scriptAppName: '',
 
     constructor: function() {
         // trigger the base class constructor
@@ -58,26 +61,8 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
         // set the base working dir
         this.baseDir = this.options['dir'] || process.cwd();
 
-        this.log(this.baseDir);
-
-        if (typeof this.env.options.appPath === 'undefined') {
-          this.option('appPath', {
-              desc: 'Allow to choose where to write the files'
-          });
-
-          this.env.options.appPath = this.options.appPath;
-
-          if (!this.env.options.appPath) {
-              try {
-                  this.env.options.appPath = require(path.join(process.cwd(), 'bower.json')).appPath;
-              } catch (e) { /* noop */ }
-          }
-
-          this.env.options.appPath = this.env.options.appPath || 'app';
-          this.options.appPath = this.env.options.appPath;
-        }
-
-        this.appPath = this.env.options.appPath;
+        // update the destination / target for output
+        this.destinationRoot(this.baseDir);
     },
 
     ask: function () {
