@@ -1,10 +1,10 @@
 {
-  "name": "generator-rs-angular",
+  "name": "angular-generator",
   "version": "1.0.0",
-  "description": "Yeoman generator",
+  "description": "rewardStyle Yeoman generator for angular projects",
   "license": "MIT",
   "main": "app/index.js",
-  "repository": "AndrewJHart/generator-generator-rs-angular",
+  "repository": "AndrewJHart/generator-rs-angular",
   "author": {
     "name": "Andrew J Hart",
     "email": "andruwhart@gmail.com",

@@ -29,7 +29,13 @@ To install generator-rs-angular clone this repo:
 git clone git@github.com:AndrewJHart/generator-rs-angular.git
 ```
 
-cd into the directory and run:
+cd into the directory and install dependencies:
+
+```bash
+npm install
+```
+
+then run:
 
 ```bash
 npm link
