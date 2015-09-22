@@ -55,6 +55,11 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
             desc: 'Sets an output directory for generated project files'
         });
 
+        // set the base working dir
+        this.baseDir = this.options['dir'] || process.cwd();
+
+        this.log(this.baseDir);
+
         if (typeof this.env.options.appPath === 'undefined') {
           this.option('appPath', {
               desc: 'Allow to choose where to write the files'
