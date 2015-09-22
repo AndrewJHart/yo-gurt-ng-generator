@@ -1,5 +1,5 @@
 {
-  "name": "<%= hypModuleName %>",
+  "name": "rs-core-testapp",
   "version": "1.0.0",
   "description": "base ng project",
   "directory": "bower_components",
@@ -18,11 +18,11 @@
     "config.json"
   ],
   "main": [
-    "src/app/<%= hypModuleName %>/<%= hypModuleName %>.module.js",
-    "src/app/<%= hypModuleName %>/<%= hypModuleName %>.ctrl.js",
-    "src/app/<%= hypModuleName %>/<%= hypModuleName %>.routes.js",
-    "src/app/<%= hypModuleName %>/<%= hypModuleName %>.tpl.html",
-    "src/app/<%= hypModuleName %>/main.less"
+    "src/app/base-ng-proj/base-ng-proj.module.js",
+    "src/app/base-ng-proj/base-ng-proj.ctrl.js",
+    "src/app/base-ng-proj/base-ng-proj.routes.js",
+    "src/app/base-ng-proj/base-ng-proj.tpl.html",
+    "src/app/base-ng-proj/main.less"
   ],
   "dependencies": {
     "angular": "~1.4.5",

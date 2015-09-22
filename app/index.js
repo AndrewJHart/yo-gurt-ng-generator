@@ -29,18 +29,31 @@ var yeoman = require('yeoman-generator'),
  *   copy any files with static content to target
  */
 var rsGenerator = module.exports = yeoman.generators.Base.extend({
+    baseDir: process.cwd(),
 
     constructor: function() {
         // trigger the base class constructor
         yeoman.generators.Base.apply(this, arguments);
 
-        // configure a require command line argument `appname`
-        this.argument('appname', { type: String, required: true });
+        // configure optional command line arg `appname`
+        this.argument('appname', {
+            type: String,
+            required: false
+        });
 
         // store the appname on instance & manipulate the string
         this.appname = this.appname || path.basename(process.cwd());
         this.appname = _str.camelize(_str.slugify(_str.humanize(this.appname)));
         this.scriptAppName = this.appname + util.appName(this);
+
+        // if we make use of component layout then the sub-generator
+        // may require an output directory for the files that are generated.
+        // as override or option
+        this.option('dir', {
+            defaults: this.baseDir,
+            type: String,
+            desc: 'Sets an output directory for generated project files'
+        });
 
         if (typeof this.env.options.appPath === 'undefined') {
           this.option('appPath', {
@@ -119,7 +132,7 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
 
           this.moduleType = props.moduleType;
           this.moduleName = props.moduleName;
-          this.finalModule = this.getModuleName()
+          this.finalModule = this._getModuleName();
 
           done();
 
@@ -133,7 +146,7 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
         var prompts = [{
           type: 'confirm',
           name: 'confirm',
-          message: 'Hows does ' + this.getModuleName() + ' work for a name?',
+          message: 'Hows does ' + this._getModuleName() + ' work for a name?',
           default: true
         }];
 
@@ -141,8 +154,8 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
         this.prompt(prompts, function (props) {
             if (props.confirm) {
                 // update the module name prop
-                this.dotModuleName = this.getModuleName('.');
-                this.hypModuleName = this.getModuleName('-');
+                this.dotModuleName = this._getModuleName('.');
+                this.hypModuleName = this._getModuleName('-');
             } else {
                 this.env.error("Aborted by user. Intentionally quitting...");
             }

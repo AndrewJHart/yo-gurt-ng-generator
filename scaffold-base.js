@@ -30,7 +30,7 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
     // if we make use of component layout then the sub-generator
     // may require an output directory for the files that are generated.
     // as override or option
-    this.argument('directory', { type: String, required: false });
+    this.option('directory', { type: String, required: false });
 
     // @TODO: insert logic for checking `directory` argument is valid
 
