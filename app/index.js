@@ -49,9 +49,7 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
         this.appname = _str.camelize(_str.slugify(_str.humanize(this.appname)));
         this.scriptAppName = this.appname + util.appName(this);
 
-        // if we make use of component layout then the sub-generator
-        // may require an output directory for the files that are generated.
-        // as override or option
+        // option to override output path for project
         this.option('dir', {
             defaults: this.baseDir,
             type: String,
@@ -60,6 +58,14 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
 
         // set the base working dir
         this.baseDir = this.options['dir'] || process.cwd();
+
+        // option to skip installing bower & npm dependencies
+        // currently all unit tests set this option
+        this.option('skip-install', {
+            defaults: false,
+            type: Boolean,
+            desc: 'Skips installation of generated projects bower & node dependencies'
+        });
 
         // update the destination / target for output
         this.destinationRoot(this.baseDir);
@@ -337,7 +343,10 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
      * dependencies after the generator has completed file ops.
      */
     install: function() {
-        this.installDependencies();
+        // install the dependencies unless user skips
+        if (!this.options['skip-install']) {
+            this.installDependencies();
+        }
     }
 });
 

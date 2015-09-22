@@ -1,0 +1,44 @@
+@componentsPath: "<%= componentsPath %>";
+
+@import "@{componentsPath}/bootstrap/less/variables.less";
+@import "@{componentsPath}/bootstrap/less/mixins.less";
+
+@import "@{componentsPath}/font-awesome/less/variables.less";
+@fa-font-path: "../assets/font-awesome/fonts";
+@import "@{componentsPath}/font-awesome/less/mixins.less";
+@import "@{componentsPath}/font-awesome/less/path.less";
+@import "@{componentsPath}/font-awesome/less/core.less";
+@import "@{componentsPath}/font-awesome/less/larger.less";
+@import "@{componentsPath}/font-awesome/less/fixed-width.less";
+@import "@{componentsPath}/font-awesome/less/list.less";
+@import "@{componentsPath}/font-awesome/less/bordered-pulled.less";
+@import "@{componentsPath}/font-awesome/less/animated.less";
+@import "@{componentsPath}/font-awesome/less/rotated-flipped.less";
+@import "@{componentsPath}/font-awesome/less/stacked.less";
+@import "@{componentsPath}/font-awesome/less/icons.less";
+
+.navbar-static-top {
+    margin-bottom: 0;
+    border-bottom: 1px solid #1265ab;
+
+    .navbar-nav {
+        .active {
+            background-color: @gray-lighter;
+        }
+    }
+}
+
+
+.rs-core-testapp-container-root {
+    .hero {
+        background-color: @brand-primary;
+        color: #7eb1dc;
+        font-size: 24px;
+        margin-bottom: 20px;
+        padding: 40px 20px;
+
+        h1 {
+            color: #fff;
+        }
+    }
+}

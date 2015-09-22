@@ -34,6 +34,7 @@
     "mkdirp": "0.5.1",
     "mkdirp-promise": "1.0.3",
     "mocha": "*",
-    "underscore.string": "3.0.3"
+    "underscore.string": "3.0.3",
+    "yeoman-assert": "^2.1.0"
   }
 }
