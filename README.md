@@ -47,17 +47,25 @@ Go up a directory (or somewhere else) and make a new directory:
 mkdir my-test-app && cd $_
 ```
 
-Finally, initiate the generator and pass your app name e.g. my-test-app:
+Finally, initiate the generator and pass your app name e.g. testapp:
 
 ```bash
-yo rs-angular my-test-app
+yo rs-angular testapp
 ```
 
-### Getting To Know Yeoman
+### Testing
 
-Yeoman has a heart of gold. He's a person with feelings and opinions, but he's very easy to work with. If you think he's too opinionated, he can be easily convinced.
+Unit tests for the generator functionality exist in the `tests` directory. I used Mocha as the testing framework. If you modify this or extend please write new tests. To run the tests `cd` into the root directory of this repo and run:
 
-If you'd like to get to know Yeoman better and meet some of his friends, [Grunt](http://gruntjs.com) and [Bower](http://bower.io), check out the complete [Getting Started Guide](https://github.com/yeoman/yeoman/wiki/Getting-Started).
+```bash
+mocha
+```
+
+If you need to run individual tests or specific test files simply pass the name:
+
+```bash
+mocha tests/test-app.js
+```
 
 
 ## License
