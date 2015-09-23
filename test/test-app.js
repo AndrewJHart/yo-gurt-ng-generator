@@ -22,31 +22,36 @@ describe('rs-angular:app', function() {
         app = null;
 
     before(function () {
-        // run the generator in this path
-        helpers.run(path.join(__dirname, '../app'))
-            // use temp folder for testing
-            .inDir(
-              targetDir
-            )
-            // supply `appname` argument
-            .withArguments(
-              ['testapp']
-            )
-            // supply test directory for output
-            .withOptions({
-              '--skip-install': true
-            })
-            // supply prompt answers
-            .withPrompts(
-              mockPrompts
-            )
-            .on('ready', function (generator) {
-              // assign the current generator to local obj
-              this.app = generator;
-            }.bind(this))
-            .on('end', function () {
+      // run the generator
+      helpers.run(path.join(__dirname, '../app'))
+          // use temp folder for testing
+          .inDir(
+            targetDir
+          )
+          // supply `appname` argument
+          .withArguments(
+            ['testapp']
+          )
+          // supply test directory for output
+          .withOptions({
+            '--skip-install': true
+          })
+          // supply prompt answers
+          .withPrompts(
+            mockPrompts
+          )
+          .on('ready', function (generator) {
+            // assign the current generator to local obj
+            this.app = generator;
+          }.bind(this))
+          .on('end', function () {
 
-            });
+          });
+    });
+
+    after(function () {
+      // after all the tests have run clean up the tmp dir
+      util.deleteFolderRecursive(targetDir);
     });
 
     describe('Dependencies', function() {
@@ -171,11 +176,6 @@ describe('rs-angular:app', function() {
             'src/app/rs-core-testapp/rs-core-testapp.tpl.html', '<div class="rs-core-testapp">'
           );
         });
-
-        // cleanup the tmp directory
-        setTimeout(function () {
-          util.deleteFolderRecursive(targetDir);
-        }, 0);
     });
 
     describe('Generator methods', function () {
