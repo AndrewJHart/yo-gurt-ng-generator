@@ -18,7 +18,8 @@ describe('rs-angular:app', function() {
           moduleName: 'testapp',
           moduleType: 'core',
           confirm: true
-        };
+        },
+        app = null;
 
     before(function () {
         // run the generator in this path
@@ -39,7 +40,11 @@ describe('rs-angular:app', function() {
             .withPrompts(
               mockPrompts
             )
-            .on('end', function() {
+            .on('ready', function (generator) {
+              // assign the current generator to local obj
+              this.app = generator;
+            }.bind(this))
+            .on('end', function () {
 
             });
     });
@@ -47,31 +52,33 @@ describe('rs-angular:app', function() {
     describe('Dependencies', function() {
 
       it('can be required without error', function () {
-        this.app = require('../app');
+        var app = require('../app');
 
         // assert app is truthy - not undefined
-        assert.equal(true, !!this.app, 'required generator should not be undefined');
+        assert.equal(true, !!app, 'required generator should not be undefined');
       });
 
       it('mixin object can be required without error', function () {
-        this.mixinGenerator = require('../generator-mixin');
+        var mixin = require('../generator-mixin');
 
-        assert(this.mixinGenerator, 'required mixin object should not be undefined');
+        assert(mixin, 'required mixin object should not be undefined');
       });
 
       it('can extend the yeoman generator object with mixin props', function () {
-        var testGenerator = yeoman.generators.Base.extend({
+        var inst = null,
+            mixin = require('../generator-mixin'),
+            TestGenerator = yeoman.generators.Base.extend({
               constructor: function () {
                 // assert that the mixin object's method is available
-                assert(
-                  _.isFunction(this.templateMany),
-                  'templateMany() does not exist on the testGenerator object.. prototype props were not added'
-                );
+                assert.implement(this, ['_templateMany']);
               }
             });
 
         // add mixin generator props onto testGenerator prototype
-        _.extend(testGenerator.prototype, this.mixinGenerator);
+        _.extend(TestGenerator.prototype, mixin);
+
+        // instantiate
+        inst = new TestGenerator();
       });
     });
 
@@ -113,11 +120,9 @@ describe('rs-angular:app', function() {
     describe('File contents and customization', function () {
 
         // assert the files have correct contents injected into them
-        it('should update bower.json and package.json with data computed from the prompts', function () {
-          assert.fileContent([
-            ['bower.json', '"name": "rs-core-testapp"'],
-            ['package.json', '"name": "rs-core-testapp"']
-          ]);
+        it('should inject bower.json and package.json with data computed from the prompts', function () {
+          assert.JSONFileContent('bower.json', {"name": "rs-core-testapp"});
+          assert.JSONFileContent('package.json', {"name": "rs-core-testapp"});
         });
 
         it('should inject index.html with proper `ng-app` and `ng-controller` names', function () {
@@ -171,6 +176,34 @@ describe('rs-angular:app', function() {
         setTimeout(function () {
           util.deleteFolderRecursive(targetDir);
         }, 0);
+    });
+
+    describe('Generator methods', function () {
+
+      // check that the computed prompts match input
+      it('should compute a hypenated module name that matches the input from the prompt', function () {
+        var name = this.app._getModuleName('-');
+
+        assert.textEqual(name, 'rs-core-testapp');
+      });
+
+      it('should compute a dot notated module name that matches the input from the prompt', function () {
+        var name = this.app._getModuleName('.');
+
+        assert.textEqual(name, 'rs.core.testapp');
+      });
+
+      it('should NOT be a custom module', function () {
+        var isCustom = this.app._isCustom();
+
+        assert.equal(isCustom, false);
+      });
+
+      it('should have a module type of core', function () {
+        var type = this.app._getModuleType();
+
+        assert.equal(type, 'core');
+      });
     });
 });
 

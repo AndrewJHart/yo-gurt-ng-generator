@@ -7,7 +7,7 @@ var FactoryGenerator = module.exports = ScaffoldGenerator.extend({
 	},
 
 	createServiceFiles: function() {
-	  this.generateSourceAndTest(
+	  this.generate(
 	    'service/factory',
 	    'spec/service',
 	    'services',

@@ -89,6 +89,16 @@ var GeneratorMixin = module.exports = {
     },
 
     /**
+     * Getter that returns the type of module the user
+     * selected based on options in the prompts.
+     *
+     * @return {String} the value of the `moduleType` string
+     */
+    _getModuleType: function () {
+        return this.moduleType;
+    },
+
+    /**
      * Iterates over multiple files, templating & copying them to target dir
      *
      * Takes `src` and `dest` directories, iterates over each found file, and

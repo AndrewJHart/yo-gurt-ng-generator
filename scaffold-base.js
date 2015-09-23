@@ -151,7 +151,7 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
    * @param  {String} targetDirectory Destination for file output
    * @param  {Boolean} skipAdd        If true skips adding the script to index.html
    */
-  generateSourceAndTest: function(appTemplate, testTemplate, targetDirectory, skipAdd) {
+  generate: function(appTemplate, testTemplate, targetDirectory, skipAdd) {
     // Services use classified names
     if (this.generatorName && this.generatorName.toLowerCase() === 'service') {
       this.cameledName = this.classedName;

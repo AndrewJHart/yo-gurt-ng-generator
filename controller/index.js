@@ -18,7 +18,7 @@ var CtrlGenerator = module.exports = ScaffoldGenerator.extend({
   },
 
   createControllerFiles: function() {
-    this.generateSourceAndTest(
+    this.generate(
       'controller',
       'spec/controller',
       this._targetFilePath,

@@ -7,7 +7,7 @@ var FilterGenerator = module.exports = ScaffoldGenerator.extend({
     },
 
 	createFilterFiles = function createFilterFiles() {
-		this.generateSourceAndTest(
+		this.generate(
 	      'filter',
 		  'spec/filter',
 	      'filters',

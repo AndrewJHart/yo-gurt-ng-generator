@@ -10,7 +10,7 @@ var ServiceGenerator = module.exports = ScaffoldGenerator.extend({
 	},
 
 	createServiceFiles: function() {
-	  this.generateSourceAndTest(
+	  this.generate(
 	    'service/service',
 	    'spec/service',
 	    'services',
