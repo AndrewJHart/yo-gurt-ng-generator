@@ -61,6 +61,12 @@ Unit tests for the generator functionality exist in the `tests` directory. I use
 mocha
 ```
 
+If you wanna spice things up a bit try running mocha with a different reporter e.g. progress bar
+
+```bash
+mocha --reporter progress
+```
+
 If you need to run individual tests or specific test files simply pass the name:
 
 ```bash

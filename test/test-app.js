@@ -21,7 +21,7 @@ describe('rs-angular:app', function() {
         },
         app = null;
 
-    before(function () {
+    before('Run the core generator with supplied args and options', function () {
       // run the generator
       helpers.run(path.join(__dirname, '../app'))
           // use temp folder for testing
@@ -45,11 +45,11 @@ describe('rs-angular:app', function() {
             this.app = generator;
           }.bind(this))
           .on('end', function () {
-
+            // left here for future
           });
     });
 
-    after(function () {
+    after('Delete all files created by the generator in the tmp directory', function () {
       // after all the tests have run clean up the tmp dir
       util.deleteFolderRecursive(targetDir);
     });
@@ -211,7 +211,10 @@ describe('rs-angular:app', function() {
  * Unit tests for sub-generators in its own describe block
  */
 describe('sub-generator rs-angular:directive', function() {
+  // pending tests
+  it('should create the expected files');
 
+  it('should inject the directive into the project');
 });
 
 //  helpers.testDirectory(path.join(__dirname, './tmp'), function() {
