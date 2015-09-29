@@ -2,6 +2,10 @@
 
 > [Yeoman](http://yeoman.io) generator
 
+### First things first..
+
+This generator needs a catchy name - any suggestions?
+
 
 ## Getting Started
 
