@@ -2,32 +2,28 @@
 
 > [Yeoman](http://yeoman.io) generator
 
-### First things first..
-
-This generator needs a catchy name - any suggestions?
-
 
 ## Getting Started
 
-### What is Yeoman?
+### What is Mason?
 
 Trick question. It's not a thing. It's this guy:
 
 ![](http://i.imgur.com/JHaAlBJ.png)
 
-Basically, he wears a top hat, lives in your computer, and waits for you to tell him what kind of application you wish to create.
+Basically, yeoman wears a top hat, lives in your computer, and waits for you to tell him what kind of application you wish to create. Yeoman and Mason are good friends and they work together to build out
+your application.
 
-Not every new computer comes with a Yeoman pre-installed. He lives in the [npm](https://npmjs.org) package repository. You only have to ask for him once, then he packs up and moves into your hard drive. *Make sure you clean up, he likes new and shiny things.*
+
+### Installation
+
+To get started first install Yeoman:
 
 ```bash
 npm install -g yo
 ```
 
-### Yeoman Generators
-
-Yeoman travels light. He didn't pack any generators when he moved in. You can think of a generator like a plug-in. You get to choose what type of application you wish to create, such as a Backbone application or even a Chrome extension.
-
-To install generator-rs-angular clone this repo:
+Then get Mason by cloning this repo:
 
 ```bash
 git clone git@github.com:AndrewJHart/generator-rs-angular.git
@@ -39,7 +35,7 @@ cd into the directory and install dependencies:
 npm install
 ```
 
-then run:
+then we need to link it so we can run it as a global package:
 
 ```bash
 npm link
