@@ -1,32 +1,32 @@
-# Mason
+# Gurt
 
 > [Yeoman](http://yeoman.io) generator
 
 
 ## Getting Started
 
-### What is Mason?
+### What is Gurt (Generate Unified rewardStyle Tools)?
 
-Trick question. It's not a thing. It's this guy:
+Trick question. It's not a thing. It's part of this guy:
 
 ![](http://i.imgur.com/JHaAlBJ.png)
 
-Basically, yeoman wears a top hat, lives in your computer, and waits for you to tell him what kind of application you wish to create. Yeoman and Mason are good friends and they work together to build out
+Basically, yeoman wears a top hat, lives in your computer, and waits for you to tell him what kind of application you wish to create. Yeoman and Gurt are good friends and they work together to build out
 your application.
 
 
 ### Installation
 
-To get started first install Yeoman:
+To get started first install Yeoman globally:
 
 ```bash
 npm install -g yo
 ```
 
-Then get Mason by cloning this repo:
+Then get Gurt by cloning this repo:
 
 ```bash
-git clone git@github.com:AndrewJHart/generator-rs-angular.git
+git clone git@github.com:rewardStyle/angular-generator.git
 ```
 
 cd into the directory and install dependencies:
@@ -50,7 +50,7 @@ mkdir my-test-app && cd $_
 Finally, initiate the generator and pass your app name e.g. testapp:
 
 ```bash
-yo rs-angular testapp
+yo gurt testapp
 ```
 
 ### Testing
