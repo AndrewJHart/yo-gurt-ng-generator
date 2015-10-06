@@ -1,4 +1,4 @@
-# generator-rs-angular
+# Mason
 
 > [Yeoman](http://yeoman.io) generator
 
