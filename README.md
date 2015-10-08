@@ -26,7 +26,7 @@ npm install -g yo
 Then get Gurt by cloning this repo:
 
 ```bash
-git clone git@github.com:rewardStyle/angular-generator.git
+git clone git@github.com:rewardStyle/generator-gurt.git
 ```
 
 cd into the directory and install dependencies:
