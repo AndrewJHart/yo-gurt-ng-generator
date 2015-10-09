@@ -1,0 +1,11 @@
+{
+    "box-model": false,
+    "adjoining-classes": false,
+    "font-sizes": false,
+    "regex-selectors": false,
+    "fallback-colors": false,
+    "unqualified-attributes": false,
+    "qualified-headings": false,
+    "unique-headings": false,
+    "floats": false
+}

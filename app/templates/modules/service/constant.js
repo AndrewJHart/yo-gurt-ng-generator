@@ -8,4 +8,4 @@
  * Constant in the <%= scriptAppName %>.
  */
 angular.module('<%= scriptAppName %>')
-  .constant('<%= cameledName %>', 42);
+    .constant('<%= cameledName %>', 42);
