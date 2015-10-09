@@ -1,47 +1,49 @@
-var app = angular.module('{{= dotModuleName }}.container', [
+'use strict';
+
+var app;
+
+app = angular.module('{{= dotModuleName }}.container', [
     '{{= dotModuleName }}',
     'ui.router',
     'templates-app',
     'templates-components'
 ])
 
-.config(['$stateProvider',
-        '$locationProvider',
-        function ($stateProvider,
-                  $locationProvider) {
+.config([
+    '$stateProvider',
+    '$locationProvider',
+    function ($stateProvider, $locationProvider) {
 
-    $locationProvider.html5Mode(true);
+        $locationProvider.html5Mode(true);
 
-    $stateProvider
-        .state('parent', {
+        $stateProvider.state('parent', {
             url: "/",
-            templateUrl: 'root.tpl.html' });
-}])
+            templateUrl: 'root.tpl.html'
+        });
+    }
+])
 
 .factory('lodash', ['$window', function ($window) {
-  return $window._;
+    return $window._;
 }])
 
 .factory('containerConfig', function () {
-  /* jshint ignore:start */
-  return <%= containerConfig %>;
-  /* jshint ignore:end */
+    /* jshint ignore:start */
+    // jscs:disable
+    return <%= containerConfig %>;
+    // jscs:enable
+    /* jshint ignore:end */
 })
 
-.controller('{{= dotModuleName }}.container.AppCtrl', ['$scope',
-                                               '$rootScope',
-                                               '$state',
-                                               'lodash',
-                                               function AppCtrl ($scope,
-                                                                 $rootScope,
-                                                                 $state,
-                                                                 _) {
-
-    console.log(':: init {{= dotModuleName }}.container.AppCtrl');
-    $scope.title = '{{= dotModuleName }}';
-
-}])
-
-
+.controller('{{= dotModuleName }}.container.AppCtrl', [
+    '$scope',
+    '$rootScope',
+    '$state',
+    'lodash',
+    function AppCtrl ($scope /*, $rootScope, $state, _*/) {
+        console.log(':: init {{= dotModuleName }}.container.AppCtrl');
+        $scope.title = '{{= dotModuleName }}';
+    }
+])
 
 ;

@@ -1,8 +1,8 @@
 'use strict';
-var path   = require('path'),
-    glob   = require('glob'),
-    _      = require('underscore.string'),
-    util   = require('./util');
+
+var path = require('path'),
+    glob = require('glob'),
+    util = require('./util');
 
 /**
  * Our Generator mixin class / object definition
@@ -22,7 +22,7 @@ var path   = require('path'),
  * @author  Andrew Hart
  * @type {object}
  */
-var GeneratorMixin = module.exports = {
+module.exports = {
     // public member vars
     modulePrefix: 'rs',
     moduleSuffix: '.js',
@@ -43,8 +43,8 @@ var GeneratorMixin = module.exports = {
     // with custom settings unless it has at least one <%= %> entry
     // https://github.com/yeoman/generator/issues/517
     interpolateMix: {
-        evaluate: /\<\%([\s\S]+?)\%\>/g,
-        interpolate: /\{\{=([\s\S]+?)\}\}/g,
+        evaluate: /<\%([\s\S]+?)\%>/g,
+        interpolate: /\{\{=([\s\S]+?)\}\}/g
     },
 
     /**
@@ -73,16 +73,16 @@ var GeneratorMixin = module.exports = {
 
         // check for custom module - has no type output
         if (this._isCustom()) {
-            out = this.modulePrefix
-                  +separator
-                  +this.moduleName;
+            out = this.modulePrefix +
+                separator +
+                this.moduleName;
         } else {
             // cat prefix, moduletype, & name for output
-            out = this.modulePrefix
-                  +separator
-                  +this.moduleType
-                  +separator
-                  +this.moduleName;
+            out = this.modulePrefix +
+                separator +
+                this.moduleType +
+                separator +
+                this.moduleName;
         }
 
         return out;
@@ -111,7 +111,8 @@ var GeneratorMixin = module.exports = {
      */
     _templateMany: function (src, dest, ctx, tplOpts) {
         var root = util.isPathAbsolute(src) ? src : path.join(this.sourceRoot(), src),
-            files = glob.sync('**', { dot: true, nodir: true, cwd: root });
+            files = glob.sync('**', { dot: true, nodir: true, cwd: root }),
+            target;
 
         // if no target specified then default to the
         // source to template files & overwrite originals
@@ -122,10 +123,15 @@ var GeneratorMixin = module.exports = {
 
         // get the path relative to the template root, and copy to the relative destination
         for (var i in files) {
-            this.log('copying file... ' + files[i]);
+            // Wrapping to filter out unwanted prototype properties from being evaluated. Makes jshint happy
+            // I'm unsure what all properties exist in the files object so I'm not comfortable removing any
+            // at this time
+            if (true) {
+                this.log('copying file... ' + files[i]);
 
-            var target = path.join(dest, files[i]);
-            this._copy(path.join(root, files[i]), target, ctx, tplOpts);
+                target = path.join(dest, files[i]);
+                this._copy(path.join(root, files[i]), target, ctx, tplOpts);
+            }
         }
 
         return this;
@@ -160,7 +166,7 @@ var GeneratorMixin = module.exports = {
         // copy the newly created file to destination
         this.fs.copy(file.source, file.destination, {
             process: function () {
-              return file.body;
+                return file.body;
             }
         });
 

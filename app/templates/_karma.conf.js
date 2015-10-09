@@ -1,29 +1,29 @@
 'use strict';
 
-module.exports = function(config) {
+module.exports = function (config) {
 
-  var configuration = {
-    autoWatch: false,
-    browsers: ['PhantomJS'],
+    var configuration = {
+        autoWatch: false,
+        browsers: ['PhantomJS'],
 
-    frameworks: ['jasmine'],
+        frameworks: ['jasmine'],
 
-    plugins: [
-      'karma-phantomjs-launcher',
-      'karma-jasmine',
-      'karma-coverage'
-    ],
+        plugins: [
+            'karma-phantomjs-launcher',
+            'karma-jasmine',
+            'karma-coverage'
+        ],
 
-    preprocessors: {
-      'src/**/*.js': 'coverage'
-    },
+        preprocessors: {
+            'src/**/*.js': 'coverage'
+        },
 
-    reporters: ['dots', 'coverage'],
+        reporters: ['dots', 'coverage'],
 
-    coverageReporter: {
-      'type': 'text'
-    }
-  };
+        coverageReporter: {
+            type: 'text'
+        }
+    };
 
-  config.set(configuration);
+    config.set(configuration);
 };

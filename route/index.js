@@ -1,53 +1,54 @@
 'use strict';
-var path = require('path'),
-    chalk = require('chalk'),
-    util = require('util'),
+
+var path              = require('path'),
+    chalk             = require('chalk'),
     ScaffoldGenerator = require('../scaffold-base.js'),
-    angularUtils = require('../util.js'),
-    bower = require(path.join(process.cwd(), 'src/bower.json'));
+    angularUtils      = require('../util.js'),
+    bower             = require(path.join(process.cwd(), 'src/bower.json'));
 
 /**
  * Subclass of ScaffoldGenerator for creating routes
  */
-var RouteGenerator = module.exports = ScaffoldGenerator.extend({
-  constructor: function() {
-    ScaffoldGenerator.apply(this, arguments);
+module.exports = ScaffoldGenerator.extend({
+    constructor: function () {
+        ScaffoldGenerator.apply(this, arguments);
 
-    this.option('uri', {
-        desc: 'Allow a custom uri for routing',
-        type: String,
-        required: false
-    });
+        this.option('uri', {
+            desc: 'Allow a custom uri for routing',
+            type: String,
+            required: false
+        });
 
-    var match = require('fs').readFileSync(path.join(
-        this.env.options.appPath,'app/container.js'), 'utf-8').match(/\.when/
-    );
+        var match = require('fs').readFileSync(path.join(
+            this.env.options.appPath,'app/container.js'), 'utf-8').match(/\.when/
+        );
 
-    if (
-      bower.dependencies['angular-route'] ||
-      bower.devDependencies['angular-route'] ||
-      match !== null
-    ) {
-      this.foundWhenForRoute = true;
-    }
+        if (
+            bower.dependencies['angular-route'] ||
+            bower.devDependencies['angular-route'] ||
+            match !== null
+        ) {
+            this.foundWhenForRoute = true;
+        }
 
-    this.hookFor('rs-angular:controller');
-    this.hookFor('rs-angular:view');
-  },
+        this.hookFor('rs-angular:controller');
+        this.hookFor('rs-angular:view');
+    },
 
-  rewriteAppJs: function () {
+    rewriteAppJs: function () {
         if (!this.foundWhenForRoute) {
             this.on('end', function () {
-              this.log(chalk.yellow(
-                '\nangular-route is not installed. Skipping adding the route to ' +
-                'src/app/container.js'
-              ));
+                this.log(chalk.yellow(
+                    '\nangular-route is not installed. Skipping adding the route to ' +
+                    'src/app/container.js'
+                ));
             });
 
             return;
         }
 
         this.uri = this.name;  // grab the uri from name & set it on options hash
+
         if (this.options.uri) {
             this.uri = this.options.uri;
         }

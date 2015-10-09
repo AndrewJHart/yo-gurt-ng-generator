@@ -2,17 +2,18 @@
 
 describe('Service: <%= cameledName %>', function () {
 
-  // load the service's module
-  beforeEach(module('<%= scriptAppName %>'));
+    // load the service's module
+    beforeEach(module('<%= scriptAppName %>'));
 
-  // instantiate service
-  var <%= cameledName %>;
-  beforeEach(inject(function (_<%= cameledName %>_) {
-    <%= cameledName %> = _<%= cameledName %>_;
-  }));
+    // instantiate service <%= cameledName %>
+    var service;
 
-  it('should do something', function () {
-    expect(!!<%= cameledName %>).toBe(true);
-  });
+    beforeEach(inject(function (_service_) {
+        service = _service_;
+    }));
+
+    it('should do something', function () {
+        expect(!!service).toBe(true);
+    });
 
 });

@@ -11,7 +11,10 @@
     "url": ""
   },
   "scripts": {
-    "test": "mocha"
+    "test": "npm run lint && mocha",
+    "lint": "npm run lint:hint && npm run lint:style",
+    "lint:hint": "jshint *.js app/ controller/ directive/ factory/ filter/ route/ service/ test/ view/",
+    "lint:style": "jscs *.js app/ controller/ directive/ factory/ filter/ route/ service/ test/ view/"
   },
   "files": [
     "app",

@@ -12,4 +12,4 @@ module.exports = {
     assets: [
         "font-awesome/fonts"
     ]
-}
+};

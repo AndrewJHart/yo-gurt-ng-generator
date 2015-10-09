@@ -7,34 +7,34 @@ var yeoman = require('yeoman-generator'),
     _str   = require('underscore.string'),
     mkdirp = require('mkdirp-promise'),
     util   = require('../util'),
-    GeneratorMixin = require('../generator-mixin');
+    GeneratorMixin = require('../generator-mixin'),
 
-/**
- * The rewardStyle angular app & module generator
- *
- * Extends the yeoman `Base` object & mixes in our
- * custom `generator-mixin` methods on the prototype.
- * (mixin occurs at EOF)
- *
- * When run it will ask some basic questions & based
- * on the user input do things such as:
- *   create a safe, namespaced app / module name in
- * form of `rs.{{module type}}.{{module/app name}}`
- *   create the project, root project files, and the
- * corresponding folders to match the project layout.
- *   automatically inject the generated app / module
- * name into the angular js files as modules
- *   generate the remaining html & css files -
- * injecting the app / module name into them.
- *   copy any files with static content to target
- */
-var rsGenerator = module.exports = yeoman.generators.Base.extend({
+    /**
+     * The rewardStyle angular app & module generator
+     *
+     * Extends the yeoman `Base` object & mixes in our
+     * custom `generator-mixin` methods on the prototype.
+     * (mixin occurs at EOF)
+     *
+     * When run it will ask some basic questions & based
+     * on the user input do things such as:
+     *   create a safe, namespaced app / module name in
+     * form of `rs.{{module type}}.{{module/app name}}`
+     *   create the project, root project files, and the
+     * corresponding folders to match the project layout.
+     *   automatically inject the generated app / module
+     * name into the angular js files as modules
+     *   generate the remaining html & css files -
+     * injecting the app / module name into them.
+     *   copy any files with static content to target
+     */
+   rsGenerator = module.exports = yeoman.generators.Base.extend({
     // instance props
     appname: '',
     baseDir: process.cwd(),
     scriptAppName: '',
 
-    constructor: function() {
+    constructor: function () {
         // trigger the base class constructor
         yeoman.generators.Base.apply(this, arguments);
 
@@ -79,72 +79,73 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
           'Welcome to the outstanding ' + chalk.red('rewardStyle Angular') + ' generator!'
         ));
 
-        var prompts = [
-            {
-              type: 'list',
-              name: 'moduleType',
-              message: 'What kind of module is this?',
-              choices: [
-              {
-                value: 'core',
-                name: 'core',
-                checked: false
-              },
-              {
-                value: 'util',
-                name: 'utility',
-                checked: false
-              },
-              {
-                value: 'coll',
-                name: 'collection',
-                checked: false
-              },
-              {
-                value: 'app',
-                name: 'app',
-                checked: false
-              },
-              {
-                value: 'custom',
-                name: 'custom',
-                checked: false
-              }]
-            },
-            {
+        var prompts = [{
+                type: 'list',
+                name: 'moduleType',
+                message: 'What kind of module is this?',
+                choices: [{
+                    value: 'core',
+                    name: 'core',
+                    checked: false
+                }, {
+                    value: 'util',
+                    name: 'utility',
+                    checked: false
+                }, {
+                    value: 'coll',
+                    name: 'collection',
+                    checked: false
+                }, {
+                    value: 'app',
+                    name: 'app',
+                    checked: false
+                }, {
+                    value: 'custom',
+                    name: 'custom',
+                    checked: false
+                }]
+            }, {
                 type: 'input',
                 name: 'moduleName',
                 validate: function (input) {
-                    if (/^([a-zA-Z0-9_-]*)$/.test(input)) return true;
+                    if (/^([a-zA-Z0-9_-]*)$/.test(input)) {
+                        return true;
+                    }
+
                     return 'Your module name cannot contain special characters or a blank space, using the default name instead';
                 },
+
                 message: 'What would you like to name this module?',
-                default: this.appname
-            }
-        ];
+
+                // jscs: disable disallowQuotedKeysInObjects
+                'default': this.appname
+                // jscs: enable disallowQuotedKeysInObjects
+            }];
 
         this.prompt(prompts, function (props) {
-          this.props = props;  // store props for later
+            this.props = props;  // store props for later
 
-          this.moduleType = props.moduleType;
-          this.moduleName = props.moduleName;
-          this.finalModule = this._getModuleName();
+            this.moduleType = props.moduleType;
+            this.moduleName = props.moduleName;
+            this.finalModule = this._getModuleName();
 
-          done();
+            done();
 
         }.bind(this));
     },
 
     confirm: function () {
-        var done = this.async();
+        var done = this.async(),
 
-        // prompt options
-        var prompts = [{
-          type: 'confirm',
-          name: 'confirm',
-          message: 'Hows does ' + this._getModuleName() + ' work for a name?',
-          default: true
-        }];
+            // prompt options
+            prompts = [{
+                type: 'confirm',
+                name: 'confirm',
+                message: 'Hows does ' + this._getModuleName() + ' work for a name?',
+                // jscs: disable disallowQuotedKeysInObjects
+                'default': true
+                // jscs: enable disallowQuotedKeysInObjects
+            }];
 
         // present user with a prompt & store response
         this.prompt(prompts, function (props) {
@@ -156,7 +157,7 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
                 this.env.error("Aborted by user. Intentionally quitting...");
             }
 
-          done();
+            done();
         }.bind(this));
     },
 
@@ -184,15 +185,15 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
             );
 
             this.template(
-              this.templatePath('_bowerrc'),     // src path
-              this.destinationPath('.bowerrc'),  // target path
-              this                               // template context
+              this.templatePath('_bowerrc'),
+              this.destinationPath('.bowerrc'),
+              this
             );
 
             this.template(
-              this.templatePath('_bower.json'),    // src path
-              this.destinationPath('bower.json'),  // target path
-              this                                 // template context
+              this.templatePath('_bower.json'),
+              this.destinationPath('bower.json'),
+              this
             );
 
             this.template(
@@ -204,6 +205,24 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
             this.template(
                 this.templatePath('_karma.conf.js'),
                 this.destinationPath('karma.conf.js'),
+                this
+            );
+
+            this.template(
+                this.templatePath('_jshintrc'),
+                this.destinationPath('.jshintrc'),
+                this
+            );
+
+            this.template(
+                this.templatePath('_jscsrc'),
+                this.destinationPath('.jscsrc'),
+                this
+            );
+
+            this.template(
+                this.templatePath('_csslintrc'),
+                this.destinationPath('.csslintrc'),
                 this
             );
             // end templating of root files
@@ -219,8 +238,14 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
             );
 
             // make the new dir to replace base-ng-proj files
-            mkdirp(this.destinationPath('src/app/')+this.hypModuleName)
-                .catch(function(err) {
+            mkdirp(this.destinationPath('src/app/') + this.hypModuleName)
+                /**
+                 * Promises implement a `catch` callback. Since this conflicts with javascript
+                 * reserved words, we need to disable that rule temporarily
+                 */
+                /* jshint -W024 */
+                .catch(function (err) {
+                    /* jshint +W024 */
                     // gracefully error out, log it & quit
                     this.env.error(err);
                 });
@@ -252,12 +277,12 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
             this.template(
                 this.templatePath('src/app/base-ng-proj/base-ng-proj.ctrl.js'),
                 this.destinationPath(
-                    'src/app/'
-                    +this.hypModuleName
-                    +'/'
-                    +this.hypModuleName
-                    +'.ctrl'
-                    +this.moduleSuffix),
+                    'src/app/' +
+                    this.hypModuleName +
+                    '/' +
+                    this.hypModuleName +
+                    '.ctrl' +
+                    this.moduleSuffix),
                 this,
                 this.interpolateMix
             );
@@ -265,12 +290,12 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
             this.template(
                 this.templatePath('src/app/base-ng-proj/base-ng-proj.module.js'),
                 this.destinationPath(
-                    'src/app/'
-                    +this.hypModuleName
-                    +'/'
-                    +this.hypModuleName
-                    +'.module'
-                    +this.moduleSuffix),
+                    'src/app/' +
+                    this.hypModuleName +
+                    '/' +
+                    this.hypModuleName +
+                    '.module' +
+                    this.moduleSuffix),
                 this,
                 this.interpolateMix
             );
@@ -278,12 +303,12 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
             this.template(
                 this.templatePath('src/app/base-ng-proj/base-ng-proj.states.js'),
                 this.destinationPath(
-                    'src/app/'
-                    +this.hypModuleName
-                    +'/'
-                    +this.hypModuleName
-                    +'.states'
-                    +this.moduleSuffix),
+                    'src/app/' +
+                    this.hypModuleName +
+                    '/' +
+                    this.hypModuleName +
+                    '.states' +
+                    this.moduleSuffix),
                 this,
                 this.interpolateMix
             );
@@ -291,12 +316,12 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
             this.template(
                 this.templatePath('src/app/base-ng-proj/base-ng-proj.spec.js'),
                 this.destinationPath(
-                    'src/app/'
-                    +this.hypModuleName
-                    +'/'
-                    +this.hypModuleName
-                    +'.spec'
-                    +this.moduleSuffix),
+                    'src/app/' +
+                    this.hypModuleName +
+                    '/' +
+                    this.hypModuleName +
+                    '.spec' +
+                    this.moduleSuffix),
                 this,
                 this.interpolateMix
             );
@@ -305,11 +330,11 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
             this.template(
                 this.templatePath('src/app/base-ng-proj/base-ng-proj.tpl.html'),
                 this.destinationPath(
-                    'src/app/'
-                    +this.hypModuleName
-                    +'/'
-                    +this.hypModuleName
-                    +'.tpl.html'),
+                    'src/app/' +
+                    this.hypModuleName +
+                    '/' +
+                    this.hypModuleName +
+                    '.tpl.html'),
                 this
             );
 
@@ -324,10 +349,10 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
             this.fs.copy(
                 this.templatePath('src/app/base-ng-proj/main.less'),
                 this.destinationPath(
-                    'src/app/'
-                    +this.hypModuleName
-                    +'/'
-                    +'main.less')
+                    'src/app/' +
+                    this.hypModuleName +
+                    '/' +
+                    'main.less')
             );
 
             this.fs.copy(
@@ -342,7 +367,7 @@ var rsGenerator = module.exports = yeoman.generators.Base.extend({
      * Automatically run bower install & npm install to install all
      * dependencies after the generator has completed file ops.
      */
-    install: function() {
+    install: function () {
         // install the dependencies unless user skips
         if (!this.options['skip-install']) {
             this.installDependencies();

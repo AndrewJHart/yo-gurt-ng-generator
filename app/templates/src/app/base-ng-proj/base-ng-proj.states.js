@@ -1,6 +1,11 @@
+/**
+ * <% if (true) {} %>{{= hypModuleName }} States
+ */
 angular.module('{{= dotModuleName }}')
 
 .config(['$stateProvider', function ($stateProvider) {
+    "use strict";
+
     $stateProvider
         .state('{{= hypModuleName }}', {
             url: "/{{= hypModuleName }}/",
@@ -9,4 +14,4 @@ angular.module('{{= dotModuleName }}')
         });
 }])
 
-;<% if (true) {} %>
+;
