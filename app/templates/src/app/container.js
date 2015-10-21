@@ -28,11 +28,7 @@ app = angular.module('{{= dotModuleName }}.container', [
 }])
 
 .factory('containerConfig', function () {
-    /* jshint ignore:start */
-    // jscs:disable
-    return <%= containerConfig %>;
-    // jscs:enable
-    /* jshint ignore:end */
+    return JSON.parse('<%= containerConfig %>');
 })
 
 .controller('{{= dotModuleName }}.container.AppCtrl', [
