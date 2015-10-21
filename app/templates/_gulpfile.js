@@ -5,7 +5,6 @@ var $                 = require('gulp-load-plugins')(),
     _                 = require('lodash'),
     argv              = require('yargs').argv,
     connectModRewrite = require('connect-modrewrite'),
-    containerConfig   = require('./config.json'),
     bower             = require('./bower.json'),
     del               = require('del'),
     glob              = require('glob'),
@@ -17,8 +16,6 @@ var $                 = require('gulp-load-plugins')(),
     semver            = require('semver'),
     streamqueue       = require('streamqueue'),
     vendorConfig      = require('./vendor_config.js'),
-    jscs              = require('gulp-jscs'),
-    // csslint           = require('gulp-csslint'),
     colors            = require('colors'),
     config            = {
         banner: '/*\n' +
@@ -92,8 +89,26 @@ var $                 = require('gulp-load-plugins')(),
                 templates: [bower.directory + '/rs-*/src/app/**/*.tpl.html']
             }
         }
-    };
+    },
+    containerConfig;
 /* jshint +W079 */
+
+try {
+    containerConfig = require('./config.json');
+} catch (error) {
+    containerConfig = {};
+    console.warn(colors.yellow('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'));
+    console.warn(colors.yellow("┃ ") + colors.yellow('⚠  ') + colors.red('WARNING!') + " No " + colors.cyan("config.json") + " file is present." + colors.yellow("           ┃"));
+    console.warn(colors.yellow("┃ ") + "This misconfigured state may cause the app misbehave." + colors.yellow(" ┃"));
+    console.warn(colors.yellow('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛'));
+    console.warn();
+}
+
+function buildError (error) {
+    console.error(error.message);
+    console.error(colors.red(" ❌  Looks like you broke the build. Shame on you. 😭"));
+    process.exit(1);
+}
 
 gulp.task('clean', function () {
     return del([
@@ -212,9 +227,11 @@ gulp.task('scripts:lint', function () {
         .pipe($.jshint())
         .pipe($.jshint.reporter('jshint-stylish'))
         .pipe($.jshint.reporter('fail'))
-        .pipe(jscs())
-        .pipe(jscs.reporter())
-        .pipe(jscs.reporter('fail'));
+        .on('error', buildError)
+        .pipe($.jscs())
+        .pipe($.jscs.reporter())
+        .pipe($.jscs.reporter('fail'))
+        .on('error', buildError);
 });
 
 gulp.task('scripts', ['clean', 'aggregate-vendor-deps', 'scripts:lint'], function () {
@@ -285,8 +302,10 @@ gulp.task('styles', ['clean', 'aggregate-vendor-deps'], function () {
     return stream.done()
         .pipe($.less())
         .pipe($.concat( pkg.name + '.' + pkg.version + '.css'))
-        // .pipe(csslint())
-        // .pipe(csslint.reporter())
+        // Disabled until we can sort out not linting vendor files
+        // .pipe($.csslint())
+        // .pipe($.csslint.reporter())
+        // .on('error', buildError)
         .pipe($.insert.prepend(config.banner))
         .pipe($.autoprefixer('last 1 version'))
         .pipe(gulp.dest(path.join(
@@ -423,10 +442,7 @@ gulp.task('test', ['scripts:lint', 'aggregate-vendor-deps'], function () {
             configFile: 'karma.conf.js',
             action: 'run'
         }))
-        .on('error', function (/*err*/) {
-            console.error(colors.red(" ❌  Looks like you broke the build. Shame on you. 😭"));
-            process.exit(1);
-        });
+        .on('error', buildError);
 });
 
 gulp.task('bump', function () {
