@@ -1,7 +1,6 @@
 .DS_Store
 node_modules
 bower_components
-config.json
 
 # ignore generated files for unit tests
 test/tmp
