@@ -223,7 +223,7 @@ gulp.task('html2js', ['clean', 'aggregate-vendor-deps'], function () {
 });
 
 gulp.task('scripts:lint', function () {
-    return gulp.src(_.flatten([config.paths.app.scripts]))
+    return gulp.src('src/!(assets)/*.js')
         .pipe($.jshint())
         .pipe($.jshint.reporter('jshint-stylish'))
         .pipe($.jshint.reporter('fail'))
