@@ -1,0 +1,34 @@
+// ---------------------------------------------------------------------------
+// Put your 3rd party specific styles / imports here. These stylings should be
+// theme related implementation of the vendor stylings, and not a functional
+// improvement.
+//
+// Any styles in this file will NOT be included if this module is used in
+// another project.
+// ---------------------------------------------------------------------------
+
+.navbar-static-top {
+    margin-bottom: 0;
+    border-bottom: 1px solid #1265ab;
+
+    .navbar-nav {
+        .active {
+            background-color: @gray-lighter;
+        }
+    }
+}
+
+
+.<%= hypModuleName %>-container-root {
+    .hero {
+        background-color: @brand-primary;
+        color: #7eb1dc;
+        font-size: 24px;
+        margin-bottom: 20px;
+        padding: 40px 20px;
+
+        h1 {
+            color: #fff;
+        }
+    }
+}

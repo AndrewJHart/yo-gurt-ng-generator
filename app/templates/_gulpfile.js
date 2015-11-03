@@ -270,48 +270,40 @@ gulp.task('scripts:dist', ['scripts', 'html2js'], function () {
     return output;
 });
 
-gulp.task('styles', ['clean', 'aggregate-vendor-deps'], function () {
+gulp.task('styles:lint', [], function () {
+    return gulp.src('src/app/**/*app.less')
+        .pipe($.less({
+            paths: [
+                './' + bower.directory
+            ]
+        }))
+        .pipe($.csslint())
+        .pipe($.csslint.reporter())
+        .on('error', buildError);
+});
 
-    var rsModules = {
-            componentsPath: '../../../../../' + bower.directory
-        },
-        appModule = {
-            componentsPath: '../../../' + bower.directory
-        },
-        containerModule = {
-            componentsPath: '../../' + bower.directory
-        },
-        stream = streamqueue({objectMode: true});
-
-    stream.queue(gulp.src(_.flatten([
-        config.dependencies.styles,
-        _.map(vendorConfig.styles, function (style) {
-            return bower.directory + '/**/' + style;
-        })
-    ])));
-
-    stream.queue(gulp.src(config.paths.rscomponents.styles)
-       .pipe($.template(rsModules)));
-
-    stream.queue(gulp.src(config.paths.app.styles)
-       .pipe($.template(appModule)));
-
-    stream.queue(gulp.src(config.paths.container.styles)
-       .pipe($.template(containerModule)));
-
-    return stream.done()
-        .pipe($.less())
+gulp.task('styles', ['clean', 'styles:lint', 'aggregate-vendor-deps'], function () {
+    return gulp.src(_.union(_.flatten([
+                config.dependencies.styles,
+                _.map(vendorConfig.styles, function (style) {
+                    return bower.directory + '/**/' + style;
+                })
+            ]),
+            config.paths.rscomponents.styles,
+            config.paths.app.styles,
+            config.paths.container.styles
+        ))
+        .pipe($.less({
+            paths: [
+                './' + bower.directory
+            ]
+        }))
         .pipe($.concat( pkg.name + '.' + pkg.version + '.css'))
-        // Disabled until we can sort out not linting vendor files
-        // .pipe($.csslint())
-        // .pipe($.csslint.reporter())
-        // .on('error', buildError)
         .pipe($.insert.prepend(config.banner))
         .pipe($.autoprefixer('last 1 version'))
         .pipe(gulp.dest(path.join(
             config.paths.build.tmp, config.paths.build.styles
         )));
-
 });
 
 gulp.task('styles:dist', ['styles'], function () {

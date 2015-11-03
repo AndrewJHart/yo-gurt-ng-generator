@@ -252,11 +252,20 @@ var yeoman = require('yeoman-generator'),
 
             // generate & template files for src dir
             // that require evaluation & interpolation
-            this.template(
+            this.fs.copy(
                 this.templatePath('src/app/container.less'),
-                this.destinationPath('src/app/container.less'),
-                this,
-                this.interpolate
+                this.destinationPath('src/app/container.less')
+            );
+
+            this.template(
+                this.templatePath('src/app/container_app.less'),
+                this.destinationPath('src/app/container_app.less'),
+                this
+            );
+
+            this.fs.copy(
+                this.templatePath('src/app/container_vendor.less'),
+                this.destinationPath('src/app/container_vendor.less')
             );
 
             this.template(
@@ -353,6 +362,24 @@ var yeoman = require('yeoman-generator'),
                     this.hypModuleName +
                     '/' +
                     'main.less')
+            );
+
+            this.fs.copy(
+                this.templatePath('src/app/base-ng-proj/main_app.less'),
+                this.destinationPath(
+                    'src/app/' +
+                    this.hypModuleName +
+                    '/' +
+                    'main_app.less')
+            );
+
+            this.fs.copy(
+                this.templatePath('src/app/base-ng-proj/main_vendor.less'),
+                this.destinationPath(
+                    'src/app/' +
+                    this.hypModuleName +
+                    '/' +
+                    'main_vendor.less')
             );
 
             this.fs.copy(
