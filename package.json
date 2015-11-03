@@ -5,6 +5,7 @@
   "license": "MIT",
   "main": "app/index.js",
   "repository": "https://github.com/rewardStyle/angular-generator",
+  "private": true,
   "author": {
     "name": "Andrew J Hart",
     "email": "andrew.hart@rewardstyle.com",
