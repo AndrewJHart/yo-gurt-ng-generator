@@ -1,4 +1,20 @@
-@componentsPath: '<% print(componentsPath) %>';
+// ---------------------------------------------------------------------------------------
+// All styles in this file are to be imported when this module is used in another project.
+// Be sure that your styles are ABSOLUTELY necessary, as they will dictate how the
+// consuming project will be displaying them.
+//
+// Any styling should be considered "vanilla" and only the functional stylings should be
+// used. Any theming should be up to the implementation.
+//
+// NOTE: The styles configured in this module's `vendor_config.js` file will be
+// included before these, and anything overriding those styles should be for functional
+// reasons. Theme related styling should go in the appropriate `container.less` file
+// ---------------------------------------------------------------------------------------
+@import "bootstrap/less/variables.less";
+@import "bootstrap/less/mixins.less";
 
-@import "@{componentsPath}/bootstrap/less/variables.less";
-@import "@{componentsPath}/bootstrap/less/mixins.less";
+// All stylings / imports for 3rd party libraries
+@import "./main_vendor.less";
+
+// All stylings / imports that are specific to this module's "vanilla" functionality
+@import "./main_app.less";

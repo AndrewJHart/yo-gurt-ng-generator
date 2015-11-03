@@ -99,10 +99,14 @@ describe('rs-angular:app', function () {
                 'src/blank.tpl.html',
                 'src/app/container.js',
                 'src/app/container.less',
+                'src/app/container_app.less',
+                'src/app/container_vendor.less',
                 'src/app/dist.html',
                 'src/app/index.html',
                 'src/app/root.tpl.html',
                 'src/app/rs-core-testapp/main.less',
+                'src/app/rs-core-testapp/main_app.less',
+                'src/app/rs-core-testapp/main_vendor.less',
                 'src/app/rs-core-testapp/rs-core-testapp.ctrl.js',
                 'src/app/rs-core-testapp/rs-core-testapp.module.js',
                 'src/app/rs-core-testapp/rs-core-testapp.spec.js',
@@ -134,10 +138,10 @@ describe('rs-angular:app', function () {
             ]);
         });
 
-        it('should inject root.tpl.html and container.less with matching classnames', function () {
+        it('should inject root.tpl.html and container_app.less with matching classnames', function () {
             assert.fileContent([
                 ['src/app/root.tpl.html', '<div class="rs-core-testapp-container-root">'],
-                ['src/app/container.less', '.rs-core-testapp-container-root {']
+                ['src/app/container_app.less', '.rs-core-testapp-container-root {']
             ]);
         });
 
