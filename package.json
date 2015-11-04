@@ -1,6 +1,6 @@
 {
   "name": "generator-gurt",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Generate Unified rewardStyle Tools. A Yeoman based generator for our angular projects",
   "license": "MIT",
   "main": "app/index.js",
