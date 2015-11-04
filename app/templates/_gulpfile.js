@@ -6,7 +6,6 @@ var $                 = require('gulp-load-plugins')(),
     argv              = require('yargs').argv,
     connectModRewrite = require('connect-modrewrite'),
     bower             = require('./bower.json'),
-    del               = require('del'),
     glob              = require('glob'),
     globLoader        = require('node-glob-loader'),
     gulp              = require('gulp'),
@@ -111,10 +110,13 @@ function buildError (error) {
 }
 
 gulp.task('clean', function () {
-    return del([
-        config.paths.build.tmp,
-        config.paths.build.dist
-    ]);
+    return gulp.src([
+            config.paths.build.tmp + '/**/*',
+            config.paths.build.dist + '/**/*'
+        ], {
+            read: false
+        })
+        .pipe($.rm());
 });
 
 gulp.task('aggregate-vendor-deps', function () {
@@ -277,9 +279,13 @@ gulp.task('styles:lint', [], function () {
                 './' + bower.directory
             ]
         }))
+        .pipe(gulp.dest(path.join(
+            config.paths.build.tmp, config.paths.build.styles
+        )))
         .pipe($.csslint())
         .pipe($.csslint.reporter())
-        .on('error', buildError);
+        .on('error', buildError)
+        .pipe($.rm());
 });
 
 gulp.task('styles', ['clean', 'styles:lint', 'aggregate-vendor-deps'], function () {
