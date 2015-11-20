@@ -139,23 +139,31 @@ var yeoman = require('yeoman-generator'),
 
             // prompt options
             prompts = [{
-                type: 'confirm',
+                type: 'input',
                 name: 'confirm',
-                message: 'Hows does ' + this._getModuleName() + ' work for a name?',
+                validate: function (input) {
+                    if (input.substring(0, 3) !== 'rs-') {
+                        return 'Your module name must be prefixed with "rs-"';
+                    }
+
+                    if (/^([a-zA-Z0-9_-]*)$/.test(input)) {
+                        return true;
+                    }
+
+                    return 'Your module name cannot contain special characters or a blank space, using the default name instead';
+                },
+                message: 'Final module name:',
                 // jscs: disable disallowQuotedKeysInObjects
-                'default': true
+                'default': this._getModuleName('-')
                 // jscs: enable disallowQuotedKeysInObjects
             }];
 
         // present user with a prompt & store response
         this.prompt(prompts, function (props) {
-            if (props.confirm) {
-                // update the module name prop
-                this.dotModuleName = this._getModuleName('.');
-                this.hypModuleName = this._getModuleName('-');
-            } else {
-                this.env.error("Aborted by user. Intentionally quitting...");
-            }
+            this.moduleName = props.confirm;
+
+            this.dotModuleName = props.confirm.split('-').join('.');
+            this.hypModuleName = props.confirm;
 
             done();
         }.bind(this));
