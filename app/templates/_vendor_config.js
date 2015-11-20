@@ -10,6 +10,6 @@ module.exports = {
         "bootstrap.css"
     ],
     assets: [
-        "font-awesome/fonts"
+        "font-awesome/fonts/*"
     ]
 };
