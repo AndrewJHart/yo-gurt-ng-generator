@@ -225,7 +225,10 @@ gulp.task('html2js', ['clean', 'aggregate-vendor-deps'], function () {
 });
 
 gulp.task('scripts:lint', function () {
-    return gulp.src('src/!(assets)/*.js')
+    return gulp.src([
+            'src/**/*.js',
+            '!src/assets/'
+        ])
         .pipe($.jshint())
         .pipe($.jshint.reporter('jshint-stylish'))
         .pipe($.jshint.reporter('fail'))
