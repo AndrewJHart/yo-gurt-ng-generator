@@ -395,6 +395,20 @@ var yeoman = require('yeoman-generator'),
                 this.destinationPath('src/blank.tpl.html')
             );
             // end of copy operations
+        },
+
+        tests: function () {
+            this.template(
+                this.templatePath('tests/_beforeAll.js'),
+                this.destinationPath('tests/beforeAll.js'),
+                this,
+                this.interpolate
+            );
+
+            this.fs.copy(
+                this.templatePath('tests/_afterAll.js'),
+                this.destinationPath('tests/afterAll.js')
+            );
         }
     },
 
