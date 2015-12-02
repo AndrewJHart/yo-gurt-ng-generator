@@ -120,6 +120,11 @@ var yeoman = require('yeoman-generator'),
                 // jscs: disable disallowQuotedKeysInObjects
                 'default': this.appname
                 // jscs: enable disallowQuotedKeysInObjects
+            }, {
+                // prompt to integrate protractor e2e support
+                type: 'confirm',
+                name: 'supportsE2E',
+                message: 'Do you want to integrate protractor e2e testing?',
             }];
 
         this.prompt(prompts, function (props) {
