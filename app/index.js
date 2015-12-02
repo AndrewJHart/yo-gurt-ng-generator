@@ -125,13 +125,21 @@ var yeoman = require('yeoman-generator'),
                 type: 'confirm',
                 name: 'supportsE2E',
                 message: 'Do you want to integrate protractor e2e testing?',
+                // jscs: disable disallowQuotedKeysInObjects
+                'default': false
+                // jscs: enable disallowQuotedKeysInObjects
             }];
 
         this.prompt(prompts, function (props) {
-            this.props = props;  // store props for later
+            // store props for later
+            this.props = props;
 
+            // store input values from prompts
             this.moduleType = props.moduleType;
             this.moduleName = props.moduleName;
+            this.supportsE2E = props.supportsE2E;
+
+            // get dot-notated version of module name
             this.finalModule = this._getModuleName();
 
             done();
@@ -414,6 +422,29 @@ var yeoman = require('yeoman-generator'),
                 this.templatePath('tests/_afterAll.js'),
                 this.destinationPath('tests/afterAll.js')
             );
+
+            // if user confirmed protractor then copy these
+            if (this.props.supportsE2E) {
+                this.fs.copy(
+                    this.templatePath('e2e/mock-data.json'),
+                    this.destinationPath('e2e/mock-data.json')
+                );
+
+                this.fs.copy(
+                    this.templatePath('e2e/mock-server.js'),
+                    this.destinationPath('e2e/mock-server.js')
+                );
+
+                this.fs.copy(
+                    this.templatePath('e2e/protractor.conf.js'),
+                    this.destinationPath('e2e/protractor.conf.js')
+                );
+
+                this.fs.copy(
+                    this.templatePath('e2e/scenarios.js'),
+                    this.destinationPath('e2e/scenarios.js')
+                );
+            }
         }
     },
 
