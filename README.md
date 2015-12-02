@@ -21,6 +21,11 @@ Containers are top level wrappers for your application, found in `/src/app/`. No
 ├── /.tmp/                                  # The folder for temporary dev output (build / watch mode).
 ├── /bower_components/                      # bower managed rS + 3rd-party libraries and utilities.
 ├── /dist/                                  # The folder for compiled output.
+├── /e2e/                                   # Contains all files related to End-to-end testing.
+│   ├── mock-data.json                      # Mock server response JSON.
+│   ├── mock-server.js                      # Connect mock server middleware.
+│   ├── protractor.conf.js                  # Protractor configuration file.
+│   └── scenarios.js                        # Protractor test scenarios.
 ├── /node_modules/                          # npm managed 3rd-party libraries and utilities.
 ├── /src/                                   # The source code of the application.
 │   ├── /app/                               # Files in the root of this directory fall within the container context.
@@ -101,8 +106,10 @@ Run `gulp watch` to see your newly generated project.
 * `gulp build` -- Compiles the payload used for temporary dev work.
 * `gulp serve` -- Serves compiled payload used for temporary dev work.
 * `gulp watch` -- Runs `gulp build` and `gulp serve`, rebuilds and reloads server when changes are detected.
-* `gulp test` -- Runs `Karma`.
-* `gulp test:e2e` -- Runs `Protractor`.
+* `gulp test` -- Runs `Karma` and `Protractor`. (see End-to-end Testing below before running)
+* `gulp test:unit` -- Runs `Karma` unit tests.
+* `gulp test:e2e` -- Runs `Protractor` E2E tests. (see End-to-end Testing below before running)
+* `gulp serve:mock` -- Runs the mock server. Not needed for E2E test tasks they invoke the mock server automatically. Good for adding mock endpoints via HTTP requests.
 * `gulp build:dist` -- Compiles the payload used for deployment.
 * `gulp serve:dist` -- Serves the payload used for deployment.
 * `gulp bump --sv <patch | minor | major>` -- Bumps version in `package.json` and `bower.json`, makes a `git` commit and tags that commit with the new version.
@@ -148,6 +155,48 @@ When you're ready to distribute your module, `cd` into your project directory an
 ### Unregister a package
 
 If you for some reason need to unregister a package, you'll need to fire up your HTTP request tool and send a `DELETE` request to `bower.rewardstyle.com:5678/packages/rs-<type>-<name>`
+
+## End-to-end Testing
+
+### Setup
+
+For End-to-end (E2E) testing, we're using `Protractor`.
+
+> Protractor is a Node.js program, and runs end-to-end tests that are also written in JavaScript and run with node. Protractor uses WebDriver to control browsers and simulate user actions.
+
+Before running a task that utilizes `Protractor`, you'll need to update WebDriver's browser dependencies -- from your project's root, run the following:
+
+```
+node_modules/protractor/bin/webdriver-manager update
+```
+
+### Mock API
+
+The mock server is run during `Protractor` E2E tests.
+
+You may add mock endpoints by making edits to `mock-server.js` and `mock-data.json`, or with the mock server running, register them with an HTTP request:
+
+```
+curl -X POST \
+    -H "mock-method: GET" \
+    -H "mock-response: 200" \
+    -H "Content-type: application/json" \
+    -H "mock-header-Last-Modified: Mon, 16 Nov 2015 11:45:00 GMT" \
+    -d '{"username": "someUser"}' http://localhost:5000/mock/api/user
+```
+
+#### Mock API HTTP Commands
+
+```
++----------+-------------------------+-------------------------+---------------------------------------------+
+| Req Type |          Route          |          Body           |                 Description                 |
++----------+-------------------------+-------------------------+---------------------------------------------+
+| POST     | /mock/{your route here} | {desired JSON response} | Creates a new mock endpoint w/ response     |
+| GET      | /reset                  |                         | Wipes all stored mock endpoints / responses |
++----------+-------------------------+-------------------------+---------------------------------------------+
+```
+
+**Note:** To interact with the mock API normally, don't include `/mock/` in the route.
 
 ## FAQ
 
