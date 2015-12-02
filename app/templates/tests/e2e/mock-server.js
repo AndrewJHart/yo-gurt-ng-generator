@@ -6,6 +6,11 @@
  * mock responses due to problems with ng-mock-e2e & intercepting
  * requests.
  *
+ * Add routes below to check for the req.url, serialize the
+ * included JSON from mock-data.json and return a response.
+ * These routes are best added before the last else block
+ * around line 136 in a new block.
+ *
  * This also has some additional functionality for building
  * dynamic / temporary reponses by configuring the mock server
  * by POST'ing data that you want to mock.. e.g. To mock out
@@ -124,16 +129,11 @@ module.exports = function mockResponse () {
             // write response
             res.writeHead(200);
             res.end();
-        } else if (req.url.indexOf('/api/v1/ltks') === 0) {  // handles many or single ltk api requests
-            // log it
-            console.log('Mocking response for ' + req.url);
 
-            // set correct header & response type
-            res.setHeader('Content-Type', 'application/json');
-            res.writeHead(200);
-
-            // write json response out
-            res.end(JSON.stringify(jsonData));
+            /**
+             * Add your own routes for api endpoint inside of
+             * else if statement before the next block
+             */
         } else {
             var mockedResponse = mocks[req.method][req.url];
 

@@ -11,7 +11,7 @@ exports.config = {
 
     specs: [
         'scenarios.js',
-        'e2e/*.js'
+        'tests/e2e/*.js'
     ],
 
     // if testing locally & would like to see protractor

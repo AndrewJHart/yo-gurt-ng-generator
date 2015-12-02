@@ -120,14 +120,6 @@ var yeoman = require('yeoman-generator'),
                 // jscs: disable disallowQuotedKeysInObjects
                 'default': this.appname
                 // jscs: enable disallowQuotedKeysInObjects
-            }, {
-                // prompt to integrate protractor e2e support
-                type: 'confirm',
-                name: 'supportsE2E',
-                message: 'Do you want to integrate protractor e2e testing?',
-                // jscs: disable disallowQuotedKeysInObjects
-                'default': false
-                // jscs: enable disallowQuotedKeysInObjects
             }];
 
         this.prompt(prompts, function (props) {
@@ -137,7 +129,6 @@ var yeoman = require('yeoman-generator'),
             // store input values from prompts
             this.moduleType = props.moduleType;
             this.moduleName = props.moduleName;
-            this.supportsE2E = props.supportsE2E;
 
             // get dot-notated version of module name
             this.finalModule = this._getModuleName();
@@ -423,28 +414,25 @@ var yeoman = require('yeoman-generator'),
                 this.destinationPath('tests/afterAll.js')
             );
 
-            // if user confirmed protractor then copy these
-            if (this.props.supportsE2E) {
-                this.fs.copy(
-                    this.templatePath('e2e/mock-data.json'),
-                    this.destinationPath('e2e/mock-data.json')
-                );
+            this.fs.copy(
+                this.templatePath('tests/e2e/mock-data.json'),
+                this.destinationPath('tests/e2e/mock-data.json')
+            );
 
-                this.fs.copy(
-                    this.templatePath('e2e/mock-server.js'),
-                    this.destinationPath('e2e/mock-server.js')
-                );
+            this.fs.copy(
+                this.templatePath('tests/e2e/mock-server.js'),
+                this.destinationPath('tests/e2e/mock-server.js')
+            );
 
-                this.fs.copy(
-                    this.templatePath('e2e/protractor.conf.js'),
-                    this.destinationPath('e2e/protractor.conf.js')
-                );
+            this.fs.copy(
+                this.templatePath('tests/e2e/protractor.conf.js'),
+                this.destinationPath('tests/e2e/protractor.conf.js')
+            );
 
-                this.fs.copy(
-                    this.templatePath('e2e/scenarios.js'),
-                    this.destinationPath('e2e/scenarios.js')
-                );
-            }
+            this.fs.copy(
+                this.templatePath('tests/e2e/scenarios.js'),
+                this.destinationPath('tests/e2e/scenarios.js')
+            );
         }
     },
 
@@ -454,9 +442,12 @@ var yeoman = require('yeoman-generator'),
      */
     install: function () {
         // install the dependencies unless user skips
-        if (!this.options['skip-install']) {
-            this.installDependencies();
-        }
+        this.installDependencies({
+            skipInstall: this.options['skip-install'],
+            callback: function () {
+              this.spawnCommand('node_modules/protractor/bin/webdriver-manager', ['update']);
+            }.bind(this) // bind the callback to the parent scope
+        });
     }
 });
 
