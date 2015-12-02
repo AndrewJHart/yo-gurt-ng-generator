@@ -16,6 +16,7 @@ var $                 = require('gulp-load-plugins')(),
     streamqueue       = require('streamqueue'),
     vendorConfig      = require('./vendor_config.js'),
     colors            = require('colors'),
+    Server            = require('karma').Server,
     config            = {
         banner: '/*\n' +
         ' *                    *** ### ### ***\n' +
@@ -65,7 +66,8 @@ var $                 = require('gulp-load-plugins')(),
                 dist    : 'dist',
                 scripts : 'scripts',
                 styles  : 'styles',
-                tmp     : '.tmp'
+                tmp     : '.tmp',
+                tests   : 'tests'
             },
             container: {
                 scripts : ['src/**/container.js'],
@@ -86,6 +88,9 @@ var $                 = require('gulp-load-plugins')(),
                 ],
                 styles: [bower.directory + '/rs-*/**/main.less'],
                 templates: [bower.directory + '/rs-*/src/app/**/*.tpl.html']
+            },
+            tests: {
+                scripts: ['tests/**/*.js']
             }
         }
     },
@@ -116,7 +121,9 @@ gulp.task('clean', function () {
         ], {
             read: false
         })
-        .pipe($.rm());
+        .pipe($.rm({
+            async: false
+        }));
 });
 
 gulp.task('aggregate-vendor-deps', function () {
@@ -193,6 +200,7 @@ gulp.task('aggregate-vendor-deps', function () {
                 }),
 
                 bower.directory + '/angular-mocks/angular-mocks.js',
+                config.paths.build.tmp + '/' + config.paths.build.tests + '/**/*.js',
                 config.paths.app.testScripts
             ]))
         };
@@ -436,14 +444,23 @@ gulp.task('watch', ['serve'], function () {
     );
 });
 
-gulp.task('test', ['scripts:lint', 'aggregate-vendor-deps'], function () {
-    return gulp.src(config.aggregated.testScripts)
-        .pipe($.filelog())
-        .pipe($.karma({
-            configFile: 'karma.conf.js',
-            action: 'run'
+gulp.task('test:prep', [], function () {
+    return gulp.src(config.paths.tests.scripts)
+        .pipe($.template({
+            containerConfig: JSON.stringify(containerConfig)
         }))
-        .on('error', buildError);
+        .pipe(gulp.dest(path.join(
+            config.paths.build.tmp,
+            config.paths.build.tests
+        )));
+});
+
+gulp.task('test', ['scripts:lint', 'test:prep', 'aggregate-vendor-deps'], function (done) {
+    new Server({
+        configFile: 'karma.conf.js',
+        singleRun: true,
+        files: config.aggregated.testScripts
+    }, done).start();
 });
 
 gulp.task('bump', function () {
