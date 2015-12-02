@@ -90,7 +90,7 @@ var $                 = require('gulp-load-plugins')(),
                 templates: [bower.directory + '/rs-*/src/app/**/*.tpl.html']
             },
             tests: {
-                scripts: ['tests/**/*.js']
+                scripts: ['tests/helpers/**/*.js']
             }
         }
     },
@@ -404,17 +404,36 @@ gulp.task('build', ['assets:copy', 'index']);
 
 gulp.task('build:dist', ['assets:copy-dist', 'index:dist']);
 
-var initConnect = function (cwd) {
+/**
+ * Starts simple node connect server. Will accept an array
+ * of custom middleware to run when server is started - if
+ * none are specified it assumes the standard connectModRewrite
+ * middleware rules to serve this application.
+ *
+ * @param  {String} cwd         Folder of files to serve
+ * @param  {Number} port        Port to run the server on - defaults to 9000
+ * @param  {Array} middlewares  Array of functions that get set as middleware
+ */
+var initConnect = function (cwd, port, middlewares) {
+    // if no middleware is passed then use original connectModRewrite rules
+    if (!middlewares) {
+        var middlewares = [];
+
+        middlewares.push(
+            connectModRewrite([
+                '!\\.?(js|css|html|eot|svg|ttf|woff|otf|css|png|jpg|git|ico) / [L]'
+            ])
+        );
+    }
+
+    // start the connect server with optional port & middleware
     $.connect.server({
         root: cwd,
-        port: 9000,
+        port: port || 9000,
         livereload: true,
-        middleware: function (/*connect, options*/) {
-            return [
-                connectModRewrite([
-                    '!\\.?(js|css|html|eot|svg|ttf|woff|otf|css|png|jpg|git|ico) / [L]'
-                ])
-            ];
+        middleware: function (connect, options) {
+            // returns an array of middleware functions
+            return middlewares;
         }
     });
 };
@@ -427,12 +446,24 @@ gulp.task('connect:dist', ['build:dist'], function () {
     initConnect(config.paths.build.dist);
 });
 
+gulp.task('connectMock', ['build'], function () {
+    // require the mock middleware / server
+    var mockMiddleware = require('./tests/e2e/mock-server.js');
+
+    // start connect w/ add'l middleware for mock request & response
+    initConnect(config.paths.build.tmp, 9000, [ mockMiddleware() ]);
+});
+
 gulp.task('serve', ['connect'], function () {
     opn('http://localhost:9000');
 });
 
 gulp.task('serve:dist', ['connect:dist'], function () {
     opn('http://localhost:9000');
+});
+
+gulp.task('serve:mock', ['connectMock'], function () {
+    opn('http://127.0.0.1:9000');
 });
 
 gulp.task('watch', ['serve'], function () {
@@ -443,6 +474,8 @@ gulp.task('watch', ['serve'], function () {
         }
     );
 });
+
+gulp.task('test', ['scripts:lint', 'test:prep', 'test:unit', 'test:e2e']);
 
 gulp.task('test:prep', [], function () {
     return gulp.src(config.paths.tests.scripts)
@@ -455,12 +488,22 @@ gulp.task('test:prep', [], function () {
         )));
 });
 
-gulp.task('test', ['scripts:lint', 'test:prep', 'aggregate-vendor-deps'], function (done) {
+gulp.task('test:unit', ['scripts:lint', 'test:prep', 'aggregate-vendor-deps'], function (done) {
     new Server({
-        configFile: 'karma.conf.js',
+        configFile: __dirname + '/karma.conf.js',
         singleRun: true,
         files: config.aggregated.testScripts
     }, done).start();
+});
+
+gulp.task('test:e2e', ['scripts:lint', 'aggregate-vendor-deps', 'connectMock'], function () {
+    return gulp.src('tests/e2e/**/*.js')
+        .pipe($.angularProtractor({
+            configFile: 'tests/e2e/protractor.conf.js',
+            autoStartStopServer: false,
+            debug: false
+        }))
+        .on('error', buildError);
 });
 
 gulp.task('bump', function () {
