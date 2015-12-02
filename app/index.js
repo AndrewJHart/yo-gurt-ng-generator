@@ -403,34 +403,34 @@ var yeoman = require('yeoman-generator'),
 
         tests: function () {
             this.template(
-                this.templatePath('tests/_beforeAll.js'),
-                this.destinationPath('tests/beforeAll.js'),
+                this.templatePath('tests/helpers/_beforeAll.js'),
+                this.destinationPath('tests/helpers/beforeAll.js'),
                 this,
                 this.interpolate
             );
 
             this.fs.copy(
-                this.templatePath('tests/_afterAll.js'),
-                this.destinationPath('tests/afterAll.js')
+                this.templatePath('tests/helpers/_afterAll.js'),
+                this.destinationPath('tests/helpers/afterAll.js')
             );
 
             this.fs.copy(
-                this.templatePath('tests/e2e/mock-data.json'),
+                this.templatePath('tests/e2e/_mock-data.json'),
                 this.destinationPath('tests/e2e/mock-data.json')
             );
 
             this.fs.copy(
-                this.templatePath('tests/e2e/mock-server.js'),
+                this.templatePath('tests/e2e/_mock-server.js'),
                 this.destinationPath('tests/e2e/mock-server.js')
             );
 
             this.fs.copy(
-                this.templatePath('tests/e2e/protractor.conf.js'),
+                this.templatePath('tests/e2e/_protractor.conf.js'),
                 this.destinationPath('tests/e2e/protractor.conf.js')
             );
 
             this.fs.copy(
-                this.templatePath('tests/e2e/scenarios.js'),
+                this.templatePath('tests/e2e/_scenarios.js'),
                 this.destinationPath('tests/e2e/scenarios.js')
             );
         }
@@ -442,11 +442,12 @@ var yeoman = require('yeoman-generator'),
      */
     install: function () {
         // install the dependencies unless user skips
+        // and when complete install webdriver-manager
         this.installDependencies({
             skipInstall: this.options['skip-install'],
             callback: function () {
               this.spawnCommand('node_modules/protractor/bin/webdriver-manager', ['update']);
-            }.bind(this) // bind the callback to the parent scope
+            }.bind(this) // bind to parent for ctx
         });
     }
 });

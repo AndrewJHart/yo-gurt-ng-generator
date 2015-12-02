@@ -90,7 +90,7 @@ var $                 = require('gulp-load-plugins')(),
                 templates: [bower.directory + '/rs-*/src/app/**/*.tpl.html']
             },
             tests: {
-                scripts: ['tests/**/*.js']
+                scripts: ['tests/helpers/**/*.js']
             }
         }
     },
@@ -448,7 +448,7 @@ gulp.task('connect:dist', ['build:dist'], function () {
 
 gulp.task('connectMock', ['build'], function () {
     // require the mock middleware / server
-    var mockMiddleware = require('.tests/e2e/mock-server.js');
+    var mockMiddleware = require('./tests/e2e/mock-server.js');
 
     // start connect w/ add'l middleware for mock request & response
     initConnect(config.paths.build.tmp, 9000, [ mockMiddleware() ]);
