@@ -256,6 +256,9 @@ gulp.task('scripts', ['clean', 'aggregate-vendor-deps', 'scripts:lint'], functio
 
     return stream.done()
         .pipe($.concat(pkg.name + '.' + pkg.version + '.js'))
+        .pipe($.ngAnnotate({
+            add: true
+        }))
         .pipe($.insert.prepend(config.banner))
         .pipe(gulp.dest(path.join(
             config.paths.build.tmp,
@@ -270,7 +273,10 @@ gulp.task('scripts:dist', ['scripts', 'html2js'], function () {
         path.join(srcPath, 'templates-app.js'),
         path.join(srcPath, 'templates-components.js')
         ])
-    .pipe($.concat(pkg.name + '.' + pkg.version + '.js'))
+    .pipe($.concat(pkg.name + '.' + pkg.version + '.min.js'))
+    .pipe($.ngAnnotate({
+        add: true
+    }))
     .pipe($.uglify())
     .pipe($.insert.prepend(config.banner))
     .pipe(gulp.dest(path.join(
