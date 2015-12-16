@@ -16,6 +16,7 @@ var $                 = require('gulp-load-plugins')(),
     streamqueue       = require('streamqueue'),
     vendorConfig      = require('./vendor_config.js'),
     colors            = require('colors'),
+    spawn             = require('child_process').spawn,
     Server            = require('karma').Server,
     config            = {
         banner: '/*\n' +
@@ -452,7 +453,7 @@ gulp.task('connect:dist', ['build:dist'], function () {
     initConnect(config.paths.build.dist);
 });
 
-gulp.task('connectMock', ['build'], function () {
+gulp.task('connect:mock', ['build'], function () {
     // require the mock middleware / server
     var mockMiddleware = require('./tests/e2e/mock-server.js');
 
@@ -468,7 +469,7 @@ gulp.task('serve:dist', ['connect:dist'], function () {
     opn('http://localhost:9000');
 });
 
-gulp.task('serve:mock', ['connectMock'], function () {
+gulp.task('serve:mock', ['connect:mock'], function () {
     opn('http://127.0.0.1:9000');
 });
 
@@ -502,7 +503,7 @@ gulp.task('test:unit', ['scripts:lint', 'test:prep', 'aggregate-vendor-deps'], f
     }, done).start();
 });
 
-gulp.task('test:e2e', ['scripts:lint', 'aggregate-vendor-deps', 'connectMock'], function () {
+gulp.task('test:e2e', ['scripts:lint', 'aggregate-vendor-deps', 'connect:mock'], function () {
     return gulp.src('tests/e2e/**/*.js')
         .pipe($.angularProtractor({
             configFile: 'tests/e2e/protractor.conf.js',
@@ -510,6 +511,47 @@ gulp.task('test:e2e', ['scripts:lint', 'aggregate-vendor-deps', 'connectMock'], 
             debug: false
         }))
         .on('error', buildError);
+});
+
+gulp.task('tools:protractor', ['connect:mock'], function () {
+    spawn(
+        'node_modules/protractor/bin/elementexplorer.js',
+        ['http://127.0.0.1:9000/'],
+        {
+            stdio: 'inherit'  // element explorer is started as child
+        }                     // process but inherit uses parent stdio's
+    )
+    .on('close', function (code) {
+        console.log('Closing protractor element explorer & shutting down server');
+
+        return process.exit(0);
+    })
+    .on('error', buildError);
+});
+
+gulp.task('webdriver:start', function (done) {
+    spawn(
+        'node_modules/protractor/bin/webdriver-manager',
+        ['start']
+    )
+    .on('close', function (code) {
+        console.log('Closing webdriver-manager and exiting task');
+        return done();
+    })
+    .on('error', buildError);
+});
+
+gulp.task('webdriver:update', function (done) {
+    spawn(
+        'node_modules/protractor/bin/webdriver-manager',
+        ['update']
+    )
+    .on('close', function (code) {
+        // webdriver-manager update has finished
+        // safe to invoke the gulp callback & return
+        return done();
+    })
+    .on('error', buildError);
 });
 
 gulp.task('bump', function () {

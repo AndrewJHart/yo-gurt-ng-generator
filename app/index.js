@@ -176,6 +176,18 @@ var yeoman = require('yeoman-generator'),
     writing: {
         root: function () {
             // template root project files first
+            mkdirp(this.destinationPath('assets'))
+                /**
+                 * Promises implement a `catch` callback. Since this conflicts with javascript
+                 * reserved words, we need to disable that rule temporarily
+                 */
+                /* jshint -W024 */
+                .catch(function (err) {
+                    /* jshint +W024 */
+                    // gracefully error out, log it & quit
+                    this.env.error(err);
+                });
+
             this.fs.copy(
                 this.templatePath('_config.json'),
                 this.destinationPath('config.json')
