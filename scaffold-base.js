@@ -31,15 +31,19 @@ module.exports = yeoman.generators.NamedBase.extend({
         // if we make use of component layout then the sub-generator
         // may require an output directory for the files that are generated.
         // as override or option
-        this.option('directory', { type: String, required: false });
+        this.option('dir', { type: String, required: false });
 
         // @TODO: insert logic for checking `directory` argument is valid
 
         // load bower.json & look for name and path
         try {
             bowerJson = require(path.join(process.cwd(), 'bower.json'));
-        } catch (e) {}
+        } catch (e) {
+            this.log("Couldn't open bower.json to retrieve existing app name");
+            process.exit(1);
+        }
 
+        // Store the apps name on instance, else try to get an app name
         if (bowerJson.name) {
             this.appname = bowerJson.name;
         } else {
@@ -47,9 +51,9 @@ module.exports = yeoman.generators.NamedBase.extend({
         }
 
         // strip spaces etc.. from app name
-        this.appname = _.slugify(_.humanize(this.appname));
+        //this.appname = 
 
-        this.scriptAppName = bowerJson.moduleName || _.camelize(this.appname) + angularUtils.appName(this);
+        // this.scriptAppName = bowerJson.moduleName || _.camelize(this.appname) + angularUtils.appName(this);
 
         // generate camel & class ver of name
         this.cameledName = _.camelize(this.name);

@@ -1,12 +1,9 @@
 'use strict';
 
 /**
- * @ngdoc directive
- * @name <%= scriptAppName %>.directive:<%= cameledName %>
- * @description
- * # <%= cameledName %>
+ * @name Module <%= hypModuleName %> <%= cameledName %>
  */
-angular.module('<%= scriptAppName %>')
+angular.module('<%= dotModuleName %>')
     .directive('<%= cameledName %>', function () {
         return {
             template: '<div></div>',

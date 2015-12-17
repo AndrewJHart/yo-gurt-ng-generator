@@ -1,10 +1,17 @@
 'use strict';
 
-var ScaffoldGenerator = require('../scaffold-base.js');
+var _                 = require('lodash'),
+    util              = require('../util'),
+    GeneratorMixin    = require('../generator-mixin'),
+    ScaffoldGenerator = require('../scaffold-base.js');
 
-module.exports = ScaffoldGenerator.extend({
+var DirectiveGenerator = module.exports = ScaffoldGenerator.extend({
     constructor: function () {
         ScaffoldGenerator.apply(this, arguments);
+
+        // Grab the formatted module names
+        this.dotModuleName = this._getModuleName();
+        this.hypModuleName = this._getModuleName('-');
     },
 
     /**
@@ -24,3 +31,6 @@ module.exports = ScaffoldGenerator.extend({
         );
     }
 });
+
+// mixin generator-mixin props onto this obj prototype
+_.extend(DirectiveGenerator.prototype, GeneratorMixin);
