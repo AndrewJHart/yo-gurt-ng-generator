@@ -50,11 +50,6 @@ module.exports = yeoman.generators.NamedBase.extend({
             this.appname = path.basename(process.cwd());
         }
 
-        // strip spaces etc.. from app name
-        //this.appname = 
-
-        // this.scriptAppName = bowerJson.moduleName || _.camelize(this.appname) + angularUtils.appName(this);
-
         // generate camel & class ver of name
         this.cameledName = _.camelize(this.name);
         this.classedName = _.classify(this.name);
