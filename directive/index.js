@@ -44,8 +44,11 @@ var DirectiveGenerator = module.exports = ScaffoldGenerator.extend({
     build: function () {
         this.generate(
             'directive',
-            '',
-            this.options['skip-add'] || false
+            this.options['dir'] || '',
+            {
+                skipAdd: this.options['skip-add'] || false,
+                testTemplate: 'spec/directive'
+            }
         );
     }
 });

@@ -5,6 +5,7 @@ var path = require('path'),
     angularUtils = require('./util.js'),
     chalk = require('chalk'),
     _ = require('underscore.string');
+    // str = require('underscore.string');
 
 /**
  * Scaffold Generator base class extends
@@ -21,6 +22,7 @@ module.exports = yeoman.generators.NamedBase.extend({
     _sourceFilePath: 'app/templates/modules/',
     _targetFilePath: 'app/',
     _scriptSuffix: '.js',
+    _dashedName: '',
 
     constructor: function () {
         var bowerJson = {};
@@ -33,7 +35,8 @@ module.exports = yeoman.generators.NamedBase.extend({
         // as override or option
         this.option('dir', { type: String, required: false });
 
-        // @TODO: insert logic for checking `directory` argument is valid
+        // add option to disable test template
+        this.option('include-tests', { type: String, required: false, defaults: true });
 
         // load bower.json & look for name and path
         try {
@@ -50,9 +53,11 @@ module.exports = yeoman.generators.NamedBase.extend({
             this.appname = path.basename(process.cwd());
         }
 
-        // generate camel & class ver of name
+        // store varying versions of this sub-generator's
+        // filename for use in templates, etc..
         this.cameledName = _.camelize(this.name);
         this.classedName = _.classify(this.name);
+        this._dashedName = _.dasherize(this.name);
 
         if (typeof this.env.options.appPath === 'undefined') {
             // look for path in options, & bower or default to name 'app'
@@ -87,9 +92,12 @@ module.exports = yeoman.generators.NamedBase.extend({
      * @param  {String} src  path to source file for processing
      * @param  {String} dest path to target for output
      */
-    testTemplate: function (/*src, dest*/) {
-        // @TODO: implement method for generating
+    testTemplate: function (src, dest) {
         // test files based on karma
+        yeoman.generators.Base.prototype.template.apply(this, [
+            src + this._scriptSuffix,
+            path.join(this.env.options.appPath, dest.toLowerCase()) + this._scriptSuffix
+        ]);
     },
 
     /**
@@ -152,10 +160,12 @@ module.exports = yeoman.generators.NamedBase.extend({
             this.cameledName = this.classedName;
         }
 
+        console.log(this.options['include-tests']);
+
         // place template in proper dir using target script path + target dir
         this.appTemplate(appTemplate, path.join(targetDir, this.name));
 
-        if (opts.testTemplate) {
+        if (this.options['include-tests'] && opts.testTemplate) {
             this.testTemplate(opts.testTemplate, path.join(targetDir, this.name));
         }
 
