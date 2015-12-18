@@ -4,8 +4,8 @@ var path = require('path'),
     yeoman = require('yeoman-generator'),
     angularUtils = require('./util.js'),
     chalk = require('chalk'),
+    fs = require('fs'),
     _ = require('underscore.string');
-    // str = require('underscore.string');
 
 /**
  * Scaffold Generator base class extends
@@ -42,6 +42,9 @@ module.exports = yeoman.generators.NamedBase.extend({
         // this should only be needed for special cases
         this.option('index-add', { type: String, required: false, deafults: false });
 
+        // add option for custom file name
+        this.option('filename', { type: String, required: false, defaults: false });
+
         // prep scaffolding generator props
         this._configure();
     },
@@ -71,14 +74,18 @@ module.exports = yeoman.generators.NamedBase.extend({
         this._dashedName = _.dasherize(this.name);
 
         // get the formatted module names &
-        // set them on this instance
+        //  set them on this instance
+        // note: these props are brought in by a base
+        //  object (generator-mixin) so do not re-define
+        // them at top of this module.. will coz them
+        //  to be shadow-props and break things
         this.dotModuleName = this._getModuleName();
         this.hypModuleName = this._getModuleName('-');
 
         // set the destination path
         if (typeof this.env.options.appPath === 'undefined') {
             // look for path in options, & bower or default to name 'app'
-            this.options.appPath = this.env.options.appPath = /* this.options['dir'] || */ 'src/app/';
+            this.options.appPath = this.env.options.appPath = 'src/app/';
         }
 
         // set the default source path in generator (used by yeoman)
@@ -175,7 +182,62 @@ module.exports = yeoman.generators.NamedBase.extend({
 
         // inject script reference into index.html if forced
         if (opts.addToIndex) {
-            this.addScriptToIndex(path.join(targetDir, this.name));
+            //this.addScriptToIndex(path.join(targetDir, this.name));
+            this.injectIntoScript(path.join(targetDir, this.name));
+        }
+    },
+
+    /**
+     * Takes the `script` name & injects the specified script
+     * into the index.html document as a new dependency
+     *
+     * @param {String} script  name of the script to be added
+     */
+    injectIntoScript: function (script) {
+        try {
+            var srcFileContents = process.cwd() + '/' +
+                path.join(
+                    this.options.appPath,
+                    path.join(
+                        this.appname,
+                        script.toLowerCase()
+                    ) + this._scriptSuffix
+                );
+            // load the script we need to append
+            var destFile = path.join(this.options.appPath, this.appname + '/rs-app-drews.module.js');
+
+            console.log('script name is: ' + script);
+            console.log('script path is:' + srcFileContents);
+            console.log('dest File: ' + destFile);
+
+            this.log(chalk.yellow(
+                '\nAdding generated script as dependency in index.html'
+            ));
+
+            //var injectedScript = require(process.cwd() + '/' + newPath);
+            fs.readFile(srcFileContents, 'utf8', function (err, data) {
+                if (err) {
+                    this.env.error(err);
+                }
+
+                this.log(data);
+
+                angularUtils.rewriteFile({
+                    file: destFile,
+                    needle: ';\n',  // '<!-- endbuild -->',
+                    splicable: [
+                        data
+                    ]
+                });
+            }.bind(this));
+
+        } catch (e) {
+            this.log.error(e);
+            // log error message to interface but don't exit
+            // to exit use generator.env.error() which logs & exits
+            this.log.error(chalk.yellow(
+                '\nUnable to find ' + destFile + '. Reference to ' + script + '.js ' + 'not added.\n'
+            ));
         }
     },
 
