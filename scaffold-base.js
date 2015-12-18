@@ -18,24 +18,29 @@ var path = require('path'),
  * @type {object}
  */
 module.exports = yeoman.generators.NamedBase.extend({
-    // @TODO: move these into config file or yo-rc.json
+    // instance props
     _sourceFilePath: 'app/templates/modules/',
     _targetFilePath: 'app/',
     _scriptSuffix: '.js',
     _specSuffix: '.spec',
+    _cameledName: '',
+    _classedName: '',
     _dashedName: '',
 
     constructor: function () {
         // trigger super constructor
         yeoman.generators.NamedBase.apply(this, arguments);
 
-        // if we make use of component layout then the sub-generator
-        // may require an output directory for the files that are generated.
-        // as override or option
+        // provide configurable directory for scaffolded scripts
         this.option('dir', { type: String, required: false });
 
         // add option to disable test template
         this.option('include-tests', { type: String, required: false, defaults: true });
+
+        // option to add dependency to index.html
+        // note dependencies are auto-added to output script so
+        // this should only be needed for special cases
+        this.option('index-add', { type: String, required: false, deafults: false });
 
         // prep scaffolding generator props
         this._configure();
@@ -73,7 +78,7 @@ module.exports = yeoman.generators.NamedBase.extend({
         // set the destination path
         if (typeof this.env.options.appPath === 'undefined') {
             // look for path in options, & bower or default to name 'app'
-            this.options.appPath = this.env.options.appPath = this.options['dir'] || 'src/app/'+this.appname+'/';
+            this.options.appPath = this.env.options.appPath = /* this.options['dir'] || */ 'src/app/';
         }
 
         // set the default source path in generator (used by yeoman)
@@ -94,9 +99,12 @@ module.exports = yeoman.generators.NamedBase.extend({
         yeoman.generators.Base.prototype.template.apply(this, [
             src + this._scriptSuffix,
             path.join(
-                this.env.options.appPath,
-                dest.toLowerCase()
-            ) + this._scriptSuffix
+                this.options.appPath,
+                path.join(
+                    this.appname,
+                    dest.toLowerCase()
+                ) + this._scriptSuffix
+            )
         ]);
     },
 
@@ -112,9 +120,12 @@ module.exports = yeoman.generators.NamedBase.extend({
         yeoman.generators.Base.prototype.template.apply(this, [
             src + this._scriptSuffix,
             path.join(
-                this.env.options.appPath,
-                dest.toLowerCase() + this._specSuffix
-            ) + this._scriptSuffix
+                this.options.appPath,
+                path.join(
+                    this.appname,
+                    dest.toLowerCase() + this._specSuffix
+                ) + this._scriptSuffix
+            )
         ]);
     },
 
@@ -132,37 +143,10 @@ module.exports = yeoman.generators.NamedBase.extend({
         yeoman.generators.NamedBase.prototype.template.apply(this, [
             src,
             path.join(
-                this.env.options.appPath,
+                this.options.appPath,
                 dest.toLowerCase()
             )
         ]);
-    },
-
-    /**
-     * Takes the `script` name & injects the specified script
-     * into the index.html document as a new dependency
-     *
-     * @param {String} script  name of the script to be added
-     */
-    addScriptToIndex: function (script) {
-        try {
-            var appPath = this.env.options.appPath,
-                fullPath = path.join(appPath, 'index.html');
-
-            angularUtils.rewriteFile({
-                file: fullPath,
-                needle: '<!-- endbuild -->',
-                splicable: [
-                    '<script src="src/' + this._targetFilePath + script.toLowerCase().replace(/\\/g, '/') + '.js"></script>'
-                ]
-            });
-        } catch (e) {
-            // log error message to interface. Consider actually stopping operations
-            // gracefully by using generator.env.error() which logs & gracefully exits
-            this.log.error(chalk.yellow(
-                '\nUnable to find ' + fullPath + '. Reference to ' + script + '.js ' + 'not added.\n'
-            ));
-        }
     },
 
     /**
@@ -184,12 +168,44 @@ module.exports = yeoman.generators.NamedBase.extend({
         // place template in proper dir using target script path + target dir
         this.appTemplate(appTemplate, path.join(targetDir, this.name));
 
-        if (this.options['include-tests'] && opts.testTemplate) {
+        // create test script unless user opts out
+        if (opts.testTemplate && this.options['include-tests']) {
             this.testTemplate(opts.testTemplate, path.join(targetDir, this.name));
         }
 
-        if (!opts.skipAdd) {
+        // inject script reference into index.html if forced
+        if (opts.addToIndex) {
             this.addScriptToIndex(path.join(targetDir, this.name));
         }
-    }
+    },
+
+    /**
+     * Takes the `script` name & injects the specified script
+     * into the index.html document as a new dependency
+     *
+     * @param {String} script  name of the script to be added
+     */
+    addScriptToIndex: function (script) {
+        try {
+            var fullPath = path.join(this.options.appPath, 'index.html');
+
+            this.log(chalk.yellow(
+                '\nAdding generated script as dependency in index.html'
+            ));
+
+            angularUtils.rewriteFile({
+                file: fullPath,
+                needle: '<base href="/" />',  // '<!-- endbuild -->',
+                splicable: [
+                    '<script type="text/javascript" src="/scripts/' + script.toLowerCase().replace(/\\/g, '/') + '.js"></script>'
+                ]
+            });
+        } catch (e) {
+            // log error message to interface but don't exit
+            // to exit use generator.env.error() which logs & exits
+            this.log.error(chalk.yellow(
+                '\nUnable to find ' + fullPath + '. Reference to ' + script + '.js ' + 'not added.\n'
+            ));
+        }
+    },
 });
