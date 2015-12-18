@@ -27,10 +27,6 @@ var _                 = require('lodash'),
 var DirectiveGenerator = module.exports = ScaffoldGenerator.extend({
     constructor: function () {
         ScaffoldGenerator.apply(this, arguments);
-
-        // get & set the formatted module names
-        this.dotModuleName = this._getModuleName();
-        this.hypModuleName = this._getModuleName('-');
     },
 
     /**

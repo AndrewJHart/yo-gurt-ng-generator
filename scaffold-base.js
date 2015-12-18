@@ -22,11 +22,10 @@ module.exports = yeoman.generators.NamedBase.extend({
     _sourceFilePath: 'app/templates/modules/',
     _targetFilePath: 'app/',
     _scriptSuffix: '.js',
+    _specSuffix: '.spec',
     _dashedName: '',
 
     constructor: function () {
-        var bowerJson = {};
-
         // trigger super constructor
         yeoman.generators.NamedBase.apply(this, arguments);
 
@@ -38,33 +37,46 @@ module.exports = yeoman.generators.NamedBase.extend({
         // add option to disable test template
         this.option('include-tests', { type: String, required: false, defaults: true });
 
+        // prep scaffolding generator props
+        this._configure();
+    },
+
+    _configure: function () {
+        var bower = {};
+
         // load bower.json & look for name and path
         try {
-            bowerJson = require(path.join(process.cwd(), 'bower.json'));
+            bower = require(path.join(process.cwd(), 'bower.json'));
         } catch (e) {
             this.log(e);
             process.exit(1);
         }
 
         // Store the apps name on instance, else try to get an app name
-        if (bowerJson.name) {
-            this.appname = bowerJson.name;
+        if (bower.name) {
+            this.appname = bower.name;
         } else {
             this.appname = path.basename(process.cwd());
         }
 
         // store varying versions of this sub-generator's
         // filename for use in templates, etc..
-        this.cameledName = _.camelize(this.name);
-        this.classedName = _.classify(this.name);
+        this._cameledName = _.camelize(this.name);
+        this._classedName = _.classify(this.name);
         this._dashedName = _.dasherize(this.name);
 
+        // get the formatted module names &
+        // set them on this instance
+        this.dotModuleName = this._getModuleName();
+        this.hypModuleName = this._getModuleName('-');
+
+        // set the destination path
         if (typeof this.env.options.appPath === 'undefined') {
             // look for path in options, & bower or default to name 'app'
-            this.options.appPath = this.env.options.appPath = 'src/app/'+this.appname+'/';
+            this.options.appPath = this.env.options.appPath = this.options['dir'] || 'src/app/'+this.appname+'/';
         }
 
-        // set the default source root path in generator (used by yeoman)
+        // set the default source path in generator (used by yeoman)
         this.sourceRoot(path.join(__dirname, this._sourceFilePath));
     },
 
@@ -81,7 +93,10 @@ module.exports = yeoman.generators.NamedBase.extend({
     appTemplate: function (src, dest) {
         yeoman.generators.Base.prototype.template.apply(this, [
             src + this._scriptSuffix,
-            path.join(this.env.options.appPath, dest.toLowerCase()) + this._scriptSuffix
+            path.join(
+                this.env.options.appPath,
+                dest.toLowerCase()
+            ) + this._scriptSuffix
         ]);
     },
 
@@ -96,7 +111,10 @@ module.exports = yeoman.generators.NamedBase.extend({
         // test files based on karma
         yeoman.generators.Base.prototype.template.apply(this, [
             src + this._scriptSuffix,
-            path.join(this.env.options.appPath, dest.toLowerCase()) + this._scriptSuffix
+            path.join(
+                this.env.options.appPath,
+                dest.toLowerCase() + this._specSuffix
+            ) + this._scriptSuffix
         ]);
     },
 
@@ -113,7 +131,10 @@ module.exports = yeoman.generators.NamedBase.extend({
     htmlTemplate: function (src, dest) {
         yeoman.generators.NamedBase.prototype.template.apply(this, [
             src,
-            path.join(this.env.options.appPath, dest.toLowerCase())
+            path.join(
+                this.env.options.appPath,
+                dest.toLowerCase()
+            )
         ]);
     },
 
@@ -157,10 +178,8 @@ module.exports = yeoman.generators.NamedBase.extend({
     generate: function (appTemplate, targetDir, opts) {
         // Services use classified names
         if (this.generatorName && this.generatorName.toLowerCase() === 'service') {
-            this.cameledName = this.classedName;
+            this._cameledName = this._classedName;
         }
-
-        console.log(this.options['include-tests']);
 
         // place template in proper dir using target script path + target dir
         this.appTemplate(appTemplate, path.join(targetDir, this.name));

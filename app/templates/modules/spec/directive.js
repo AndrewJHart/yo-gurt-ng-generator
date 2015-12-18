@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Directive: <%= cameledName %>', function () {
+describe('Directive: <%= _cameledName %>', function () {
 
     // load the directive's module
     beforeEach(module('<%= dotModuleName %>'));
@@ -15,6 +15,6 @@ describe('Directive: <%= cameledName %>', function () {
     it('should make hidden element visible', inject(function ($compile) {
         element = angular.element('<<%= _dashedName %>></<%= _dashedName %>>');
         element = $compile(element)(scope);
-        expect(element.text()).toBe('this is the <%= cameledName %> directive');
+        expect(element.text()).toBe('this is the <%= _cameledName %> directive');
     }));
 });
