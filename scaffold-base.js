@@ -39,7 +39,7 @@ module.exports = yeoman.generators.NamedBase.extend({
         try {
             bowerJson = require(path.join(process.cwd(), 'bower.json'));
         } catch (e) {
-            this.log("Couldn't open bower.json to retrieve existing app name");
+            this.log(e);
             process.exit(1);
         }
 
