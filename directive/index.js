@@ -5,11 +5,30 @@ var _                 = require('lodash'),
     GeneratorMixin    = require('../generator-mixin'),
     ScaffoldGenerator = require('../scaffold-base.js');
 
+/**
+ * The Directive scaffolding generator
+ *
+ * methods prefixed with an underscore `_` are kept
+ *  out of the yeoman run time loop.
+ *
+ * This object gets "inherits" its methods from two
+ *  other objects `GeneratorMixin` and `ScaffoldGenerator`
+ * by mixing in their methods on its prototype. The
+ *  technique used here is to extend one object
+ * directly and then to grab the other objects proto
+ *  props by employing use of the _.extend() later
+ *
+ * Base methods can be found `./scaffold-base.js`
+ *  and `./generator-mixin.js`
+ *
+ * @author  Andrew Hart
+ * @type {object}
+ */
 var DirectiveGenerator = module.exports = ScaffoldGenerator.extend({
     constructor: function () {
         ScaffoldGenerator.apply(this, arguments);
 
-        // Grab the formatted module names
+        // get & set the formatted module names
         this.dotModuleName = this._getModuleName();
         this.hypModuleName = this._getModuleName('-');
     },
@@ -25,8 +44,7 @@ var DirectiveGenerator = module.exports = ScaffoldGenerator.extend({
     build: function () {
         this.generate(
             'directive',
-            'spec/directive',
-            'directives',
+            '',
             this.options['skip-add'] || false
         );
     }

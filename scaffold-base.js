@@ -61,13 +61,8 @@ module.exports = yeoman.generators.NamedBase.extend({
 
         if (typeof this.env.options.appPath === 'undefined') {
             // look for path in options, & bower or default to name 'app'
-            this.env.options.appPath = this.options.appPath || bowerJson.appPath || 'src';
-
-            // copy the app path to options hash
-            this.options.appPath = this.env.options.appPath;
+            this.options.appPath = this.env.options.appPath = 'src/app/'+this.appname+'/';
         }
-
-        this.env.options.testPath = this.env.options.testPath || bowerJson.testPath || 'test/spec';
 
         // set the default source root path in generator (used by yeoman)
         this.sourceRoot(path.join(__dirname, this._sourceFilePath));
@@ -152,23 +147,25 @@ module.exports = yeoman.generators.NamedBase.extend({
      * `target` directory
      *
      * @param  {String} appTemplate     Source script file to render & copy
-     * @param  {String} testTemplate    Source test file to render & copy
+     * @param  {String} testTemplate    (Optional) Source test file to render & copy
      * @param  {String} targetDirectory Destination for file output
      * @param  {Boolean} skipAdd        If true skips adding the script to index.html
      */
-    generate: function (appTemplate, testTemplate, targetDirectory, skipAdd) {
+    generate: function (appTemplate, targetDir, opts) {
         // Services use classified names
         if (this.generatorName && this.generatorName.toLowerCase() === 'service') {
             this.cameledName = this.classedName;
-            console.log(this.generatorName);
         }
 
         // place template in proper dir using target script path + target dir
-        this.appTemplate(appTemplate, path.join(targetDirectory, this.name));
-        this.testTemplate(testTemplate, path.join(targetDirectory, this.name));
+        this.appTemplate(appTemplate, path.join(targetDir, this.name));
 
-        if (!skipAdd) {
-            this.addScriptToIndex(path.join(targetDirectory, this.name));
+        if (opts.testTemplate) {
+            this.testTemplate(opts.testTemplate, path.join(targetDir, this.name));
+        }
+
+        if (!opts.skipAdd) {
+            this.addScriptToIndex(path.join(targetDir, this.name));
         }
     }
 });
