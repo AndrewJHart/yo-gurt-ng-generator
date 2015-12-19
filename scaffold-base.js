@@ -18,10 +18,11 @@ var path = require('path'),
  * @author  Andrew Hart
  * @type {object}
  */
-module.exports = yeoman.generators.NamedBase.extend({
+var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
     // instance props
     _sourceFilePath: 'app/templates/modules/',
     _targetFilePath: 'app/',
+    _baseAppPath: 'src/app/',
     _scriptSuffix: '.js',
     _specSuffix: '.spec',
     _cameledName: '',
@@ -81,14 +82,14 @@ module.exports = yeoman.generators.NamedBase.extend({
         // note: these props are brought in by a base
         //  object (generator-mixin) so do not re-define
         // them at top of this module.. will coz them
-        //  to be shadow-props and break things
+        //  to be shadow-props & break things
         this.dotModuleName = this._getModuleName();
         this.hypModuleName = this._getModuleName('-');
 
         // set the destination path
         if (typeof this.env.options.appPath === 'undefined') {
             // look for path in options, & bower or default to name 'app'
-            this.options.appPath = this.env.options.appPath = 'src/app/';
+            this.options.appPath = this.env.options.appPath = this._baseAppPath;
         }
 
         // set the default source path in generator (used by yeoman)
@@ -106,33 +107,7 @@ module.exports = yeoman.generators.NamedBase.extend({
      * @param  {String} dest path to target for output
      */
     appTemplate: function (src, dest) {
-        //var deferred = Q.defer();
-        // var newTemplate = yeoman.generators.Base.template.bind(this);
-        // var newTemplate = this.template.bind(this);
-        // var asyncTemplate = Q.nfbind(newTemplate).bind(this);
-
-        //Q.nfapply(this.template)
-
-        // this.template(
-        //     src + this._scriptSuffix,
-        //     path.join(
-        //         this.options.appPath,
-        //         path.join(
-        //             this.appname,
-        //             dest.toLowerCase()
-        //         ) + this._scriptSuffix
-        //     ),
-        //     this,
-        //     {
-        //         process: function () {
-        //             console.log('callback triggered');
-        //         }
-        //     }
-        // );
-
-        var x = Q.nbind(this.template, this);
-
-        x(
+        this.template(
             src + this._scriptSuffix,
             path.join(
                 this.options.appPath,
@@ -140,46 +115,8 @@ module.exports = yeoman.generators.NamedBase.extend({
                     this.appname,
                     dest.toLowerCase()
                 ) + this._scriptSuffix
-            ),
-            this
-        ).then(function (val) {
-            console.log('holy MONKEEEEES');
-            console.log(val);
-            console.log("id done");
-        })
-        .catch(function (error) {
-            console.log(error);
-        })
-        .done(function () {
-            console.log('Done');
-        });
-        // Q.nfbind(yeoman.generators.Base.prototype.template.apply(this, [
-        //     src + this._scriptSuffix,
-        //     path.join(
-        //         this.options.appPath,
-        //         path.join(
-        //             this.appname,
-        //             dest.toLowerCase()
-        //         ) + this._scriptSuffix
-        //     )
-        // ]))
-        // asyncTemplate(
-        //     src + this._scriptSuffix,
-        //     path.join(
-        //         this.options.appPath,
-        //         path.join(
-        //             this.appname,
-        //             dest.toLowerCase()
-        //         ) + this._scriptSuffix
-        //     )
-        // )
-        // .done(function (val) {
-        //     console.log('---------------');
-        //     console.log(val);
-        //     console.log('---------------');
-        // }.bind(this));
-
-        //return deferred.promise;
+            )
+        );
     },
 
     /**
@@ -251,12 +188,23 @@ module.exports = yeoman.generators.NamedBase.extend({
         if (opts.addToIndex) {
             this.addScriptToIndex(path.join(targetDir, this.name));
         }
-        // if filename was not specified inject script into {appname}.module.js
+        // if filename was not passed then inject script into {app}.module.js
         if (!this.options['filename']) {
-            setTimeout(function () {
-                this.injectScript(path.join(targetDir, this.name));
-                console.log('timeout');
-            }.bind(this), 1000);
+            // close over to preserve multiple contexts
+            // in case we need both `this`s inside of cb
+            (function (ctx) {
+                ctx._writeFiles(function () {
+                    // file has been flushed from memory
+                    // to disk - now have access to inject
+                    // its contents into dest script
+                    ctx.injectScript(
+                        path.join(
+                            targetDir,
+                            ctx.name
+                        )
+                    );
+                });
+            })(this);
         }
     },
 
@@ -301,7 +249,7 @@ module.exports = yeoman.generators.NamedBase.extend({
                 });
 
                 this.log(chalk.yellow(
-                    '\nAdding generated script\'s contents as dependency into ' + this.appname + '.module.js'
+                    '\nAdded generated script\'s contents as dependency into ' + this.appname + '.module.js'
                 ));
 
                 // cleanup the previously generated file that
@@ -312,8 +260,8 @@ module.exports = yeoman.generators.NamedBase.extend({
         } catch (e) {
             // log error message to interface but don't exit
             this.log.error(chalk.yellow(
-                e
-               // '\nUnable to find ' + destFile + '. Reference to ' + script + '.js ' + 'not added.\n'
+                e +
+               '\nUnable to find ' + destFile + '. Reference to ' + script + '.js ' + 'not added.\n'
             ));
         }
     },
