@@ -5,13 +5,14 @@ var path = require('path'),
     angularUtils = require('./util.js'),
     chalk = require('chalk'),
     fs = require('fs'),
-    _ = require('underscore.string');
+    _ = require('underscore.string'),
+    Q = require('q');  // yep i'm introducing promises
 
 /**
  * Scaffold Generator base class extends
- * yeoman NamedBase for generating files with
+ *  yeoman NamedBase for generating files with
  * a named option passed in. Used by each
- * sub-generator for scaffolding out the modules
+ *  sub-generator for scaffolding out the modules
  * & tests.
  *
  * @author  Andrew Hart
@@ -43,6 +44,8 @@ module.exports = yeoman.generators.NamedBase.extend({
         this.option('index-add', { type: String, required: false, deafults: false });
 
         // add option for custom file name
+        //  note: if you add a filename the generated script
+        //  will not be injected into *.module.js
         this.option('filename', { type: String, required: false, defaults: false });
 
         // prep scaffolding generator props
@@ -103,7 +106,33 @@ module.exports = yeoman.generators.NamedBase.extend({
      * @param  {String} dest path to target for output
      */
     appTemplate: function (src, dest) {
-        yeoman.generators.Base.prototype.template.apply(this, [
+        //var deferred = Q.defer();
+        // var newTemplate = yeoman.generators.Base.template.bind(this);
+        // var newTemplate = this.template.bind(this);
+        // var asyncTemplate = Q.nfbind(newTemplate).bind(this);
+
+        //Q.nfapply(this.template)
+
+        // this.template(
+        //     src + this._scriptSuffix,
+        //     path.join(
+        //         this.options.appPath,
+        //         path.join(
+        //             this.appname,
+        //             dest.toLowerCase()
+        //         ) + this._scriptSuffix
+        //     ),
+        //     this,
+        //     {
+        //         process: function () {
+        //             console.log('callback triggered');
+        //         }
+        //     }
+        // );
+
+        var x = Q.nbind(this.template, this);
+
+        x(
             src + this._scriptSuffix,
             path.join(
                 this.options.appPath,
@@ -111,8 +140,46 @@ module.exports = yeoman.generators.NamedBase.extend({
                     this.appname,
                     dest.toLowerCase()
                 ) + this._scriptSuffix
-            )
-        ]);
+            ),
+            this
+        ).then(function (val) {
+            console.log('holy MONKEEEEES');
+            console.log(val);
+            console.log("id done");
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
+        .done(function () {
+            console.log('Done');
+        });
+        // Q.nfbind(yeoman.generators.Base.prototype.template.apply(this, [
+        //     src + this._scriptSuffix,
+        //     path.join(
+        //         this.options.appPath,
+        //         path.join(
+        //             this.appname,
+        //             dest.toLowerCase()
+        //         ) + this._scriptSuffix
+        //     )
+        // ]))
+        // asyncTemplate(
+        //     src + this._scriptSuffix,
+        //     path.join(
+        //         this.options.appPath,
+        //         path.join(
+        //             this.appname,
+        //             dest.toLowerCase()
+        //         ) + this._scriptSuffix
+        //     )
+        // )
+        // .done(function (val) {
+        //     console.log('---------------');
+        //     console.log(val);
+        //     console.log('---------------');
+        // }.bind(this));
+
+        //return deferred.promise;
     },
 
     /**
@@ -182,46 +249,49 @@ module.exports = yeoman.generators.NamedBase.extend({
 
         // inject script reference into index.html if forced
         if (opts.addToIndex) {
-            //this.addScriptToIndex(path.join(targetDir, this.name));
-            this.injectIntoScript(path.join(targetDir, this.name));
+            this.addScriptToIndex(path.join(targetDir, this.name));
+        }
+        // if filename was not specified inject script into {appname}.module.js
+        if (!this.options['filename']) {
+            setTimeout(function () {
+                this.injectScript(path.join(targetDir, this.name));
+                console.log('timeout');
+            }.bind(this), 1000);
         }
     },
 
     /**
-     * Takes the `script` name & injects the specified script
-     * into the index.html document as a new dependency
+     * Takes the `script` name & injects the specified scripts
+     *  contents into the {appname}.module.js script as a new
+     * dependency
      *
      * @param {String} script  name of the script to be added
      */
-    injectIntoScript: function (script) {
+    injectScript: function (script) {
         try {
-            var srcFileContents = process.cwd() + '/' +
+            // load source file
+            var srcFile = process.cwd() + '/' +
                 path.join(
                     this.options.appPath,
                     path.join(
                         this.appname,
                         script.toLowerCase()
                     ) + this._scriptSuffix
+                ),
+                // load dest script we need to append to
+                destFile = path.join(
+                    this.options.appPath,
+                    this.appname + '/' + this.appname + '.module.js'
                 );
-            // load the script we need to append
-            var destFile = path.join(this.options.appPath, this.appname + '/rs-app-drews.module.js');
 
-            console.log('script name is: ' + script);
-            console.log('script path is:' + srcFileContents);
-            console.log('dest File: ' + destFile);
 
-            this.log(chalk.yellow(
-                '\nAdding generated script as dependency in index.html'
-            ));
-
-            //var injectedScript = require(process.cwd() + '/' + newPath);
-            fs.readFile(srcFileContents, 'utf8', function (err, data) {
+            // read source file's contents and append to dest file
+            fs.readFile(srcFile, 'utf8', function (err, data) {
                 if (err) {
                     this.env.error(err);
                 }
 
-                this.log(data);
-
+                // append contents to dest file
                 angularUtils.rewriteFile({
                     file: destFile,
                     needle: ';\n',  // '<!-- endbuild -->',
@@ -229,14 +299,21 @@ module.exports = yeoman.generators.NamedBase.extend({
                         data
                     ]
                 });
+
+                this.log(chalk.yellow(
+                    '\nAdding generated script\'s contents as dependency into ' + this.appname + '.module.js'
+                ));
+
+                // cleanup the previously generated file that
+                // was used for getting contents to copy
+                fs.unlinkSync(srcFile);
             }.bind(this));
 
         } catch (e) {
-            this.log.error(e);
             // log error message to interface but don't exit
-            // to exit use generator.env.error() which logs & exits
             this.log.error(chalk.yellow(
-                '\nUnable to find ' + destFile + '. Reference to ' + script + '.js ' + 'not added.\n'
+                e
+               // '\nUnable to find ' + destFile + '. Reference to ' + script + '.js ' + 'not added.\n'
             ));
         }
     },

@@ -38,6 +38,7 @@
     "mkdirp": "0.5.1",
     "mkdirp-promise": "1.0.3",
     "mocha": "*",
+    "q": "^1.4.1",
     "rimraf": "^2.4.3",
     "underscore.string": "3.0.3",
     "yeoman-assert": "^2.1.0"
