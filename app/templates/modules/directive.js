@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * @name Module <%= hypModuleName %> <%= _cameledName %>
  */

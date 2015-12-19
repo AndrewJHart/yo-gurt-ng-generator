@@ -6,7 +6,6 @@ var path = require('path'),
     chalk = require('chalk'),
     fs = require('fs'),
     _ = require('underscore.string'),
-    Q = require('q');  // yep i'm introducing promises
 
 /**
  * Scaffold Generator base class extends
@@ -18,7 +17,7 @@ var path = require('path'),
  * @author  Andrew Hart
  * @type {object}
  */
-var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
+ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
     // instance props
     _sourceFilePath: 'app/templates/modules/',
     _targetFilePath: 'app/',
@@ -128,7 +127,7 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
      */
     testTemplate: function (src, dest) {
         // test files based on karma
-        yeoman.generators.Base.prototype.template.apply(this, [
+        this.template(
             src + this._scriptSuffix,
             path.join(
                 this.options.appPath,
@@ -137,7 +136,7 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
                     dest.toLowerCase() + this._specSuffix
                 ) + this._scriptSuffix
             )
-        ]);
+        );
     },
 
     /**
@@ -151,13 +150,13 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
      * @param  {String} dest path to target for output
      */
     htmlTemplate: function (src, dest) {
-        yeoman.generators.NamedBase.prototype.template.apply(this, [
+        this.template(
             src,
             path.join(
                 this.options.appPath,
                 dest.toLowerCase()
             )
-        ]);
+        );
     },
 
     /**
@@ -242,7 +241,7 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
                 // append contents to dest file
                 angularUtils.rewriteFile({
                     file: destFile,
-                    needle: ';\n',  // '<!-- endbuild -->',
+                    needle: ';',
                     splicable: [
                         data
                     ]
