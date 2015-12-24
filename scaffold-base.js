@@ -48,6 +48,17 @@ ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
         //  will not be injected into *.module.js
         this.option('filename', { type: String, required: false, defaults: false });
 
+        // todo: mix this in with option for filename to add generated
+        // todo: code to existing *.module.js script
+        this.option('module-add', { type: String, required: false, defaults: true });
+
+        // must pass a filename if not injecting generated script into existing module
+        if (!this.options['filename'] && this.options['module-add']) {
+            this.env.error(chalk.red(
+                'If not injecting generated script into *.module.js then you must pass a filename for output'
+            ));
+        }
+
         // prep scaffolding generator props
         this._configure();
     },
@@ -188,7 +199,7 @@ ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
             this.addScriptToIndex(path.join(targetDir, this.name));
         }
         // if filename was not passed then inject script into {app}.module.js
-        if (!this.options['filename']) {
+        if (!this.options['filename'] || !this.options['module-add']) {
             // close over to preserve multiple contexts
             // in case we need both `this`s inside of cb
             (function (ctx) {
