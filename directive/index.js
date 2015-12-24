@@ -48,6 +48,3 @@ var DirectiveGenerator = module.exports = ScaffoldGenerator.extend({
         );
     }
 });
-
-// mixin generator-mixin props onto this obj prototype
-_.extend(DirectiveGenerator.prototype, GeneratorMixin);

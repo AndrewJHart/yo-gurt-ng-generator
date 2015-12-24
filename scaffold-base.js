@@ -1,11 +1,13 @@
 'use strict';
 
-var path = require('path'),
-    yeoman = require('yeoman-generator'),
-    angularUtils = require('./util.js'),
-    chalk = require('chalk'),
-    fs = require('fs'),
-    _ = require('underscore.string'),
+var path           = require('path'),
+    yeoman         = require('yeoman-generator'),
+    angularUtils   = require('./util.js'),
+    chalk          = require('chalk'),
+    fs             = require('fs'),
+    _str           = require('underscore.string'),
+    _              = require('lodash'),
+    GeneratorMixin = require('./generator-mixin'),
 
 /**
  * Scaffold Generator base class extends
@@ -53,7 +55,7 @@ ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
         this.option('module-add', { type: String, required: false, defaults: true });
 
         // must pass a filename if not injecting generated script into existing module
-        if (!this.options['filename'] && this.options['module-add']) {
+        if (!this.options['filename'] && !this.options['module-add']) {
             this.env.error(chalk.red(
                 'If not injecting generated script into *.module.js then you must pass a filename for output'
             ));
@@ -83,18 +85,16 @@ ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
 
         // store varying versions of this sub-generator's
         // filename for use in templates, etc..
-        this._cameledName = _.camelize(this.name);
-        this._classedName = _.classify(this.name);
-        this._dashedName = _.dasherize(this.name);
+        this._cameledName = _str.camelize(this.name);
+        this._classedName = _str.classify(this.name);
+        this._dashedName = _str.dasherize(this.name);
 
         // get the formatted module names &
-        //  set them on this instance
-        // note: these props are brought in by a base
-        //  object (generator-mixin) so do not re-define
-        // them at top of this module.. will coz them
-        //  to be shadow-props & break things
+        // set them on this instance
         this.dotModuleName = this._getModuleName();
         this.hypModuleName = this._getModuleName('-');
+
+        console.log(this.dotModuleName, ScaffoldGenerator.prototype);
 
         // set the destination path
         if (typeof this.env.options.appPath === 'undefined') {
@@ -104,6 +104,31 @@ ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
 
         // set the default source path in generator (used by yeoman)
         this.sourceRoot(path.join(__dirname, this._sourceFilePath));
+    },
+
+    /**
+     * Overridden to augment functionality of GeneratorMixin::_getModuleName()
+     *
+     * Constructs a namespaced module name based on the inputs provided
+     * by the user in the previous prompts. Can take an optional `separator`
+     * for use in outputting the name - defaults to `.` if none is provided.
+     *
+     * @param  {String} separator type of char or string used as separator for output
+     * @return {String}           returns fully namespaced module name per rS spec
+     */
+    _getModuleName: function (separator) {
+        // default to dot notation if nothing passed
+        if (!separator) {
+            separator = '.';
+        }
+
+        // appname prop is only persistent state for the generated
+        // app / module name at time of scaffold generator execution
+        if (!this.moduleName || this.moduleName === '') {
+            return this.appname.replace(/-/g, separator);
+        } else {
+            return this.moduleName.replace(/-/g, separator);
+        }
     },
 
     /**
@@ -151,26 +176,6 @@ ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
     },
 
     /**
-     * Takes `src` and `dest` params - copying and templating
-     * html files.
-     *
-     * appTemplate delegates to `generators.Base.template()`
-     * calling it with the current context.
-     *
-     * @param  {String} src  path to source file for processing
-     * @param  {String} dest path to target for output
-     */
-    htmlTemplate: function (src, dest) {
-        this.template(
-            src,
-            path.join(
-                this.options.appPath,
-                dest.toLowerCase()
-            )
-        );
-    },
-
-    /**
      * Accepts the `appTemplate` & `testTemplate` files and delegates
      * to internal methods to copy & template these files into the
      * `target` directory
@@ -199,7 +204,7 @@ ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
             this.addScriptToIndex(path.join(targetDir, this.name));
         }
         // if filename was not passed then inject script into {app}.module.js
-        if (!this.options['filename'] || !this.options['module-add']) {
+        if (!this.options['filename'] || this.options['module-add']) {
             // close over to preserve multiple contexts
             // in case we need both `this`s inside of cb
             (function (ctx) {
@@ -236,11 +241,18 @@ ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
                         script.toLowerCase()
                     ) + this._scriptSuffix
                 ),
+                // load source data
+                srcData = '',
                 // load dest script we need to append to
                 destFile = path.join(
                     this.options.appPath,
                     this.appname + '/' + this.appname + '.module.js'
                 );
+
+            // todo: deprecate fs.readFile and use in-memory file handle
+            // todo: to object to grab its data and pass to rewriteFile
+            // todo: - obviates the need to create and write a throw away
+            // todo: file to disk
 
 
             // read source file's contents and append to dest file
@@ -306,3 +318,7 @@ ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
         }
     },
 });
+
+// mixin generator-mixin props onto this obj prototype
+_.extend(ScaffoldGenerator.prototype, GeneratorMixin);
+

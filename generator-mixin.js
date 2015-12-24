@@ -71,23 +71,18 @@ module.exports = {
             separator = '.';  // default to dot notation if nothing passed
         }
 
-        // try to look for appname in property from another object proto
-        if (!this.moduleName || this.moduleName === '') {
-            out = this.appname.replace(/-/g, separator);
+        // check for custom module - has no type output
+        if (this._isCustom()) {
+            out = this.modulePrefix +
+                separator +
+                this.moduleName;
         } else {
-            // check for custom module - has no type output
-            if (this._isCustom()) {
-                out = this.modulePrefix +
-                    separator +
-                    this.moduleName;
-            } else {
-                // cat prefix, moduletype, & name for output
-                out = this.modulePrefix +
-                    separator +
-                    this.moduleType +
-                    separator +
-                    this.moduleName;
-            }
+            // cat prefix, moduletype, & name for output
+            out = this.modulePrefix +
+                separator +
+                this.moduleType +
+                separator +
+                this.moduleName;
         }
 
         return out;
