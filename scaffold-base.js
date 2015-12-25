@@ -7,7 +7,9 @@ var path           = require('path'),
     fs             = require('fs'),
     _str           = require('underscore.string'),
     _              = require('lodash'),
-    GeneratorMixin = require('./generator-mixin'),
+    streams        = require('memory-streams'),
+    ejs            = require('ejs'),
+    GeneratorMixin = require('./generator-mixin');
 
 /**
  * Scaffold Generator base class extends
@@ -19,7 +21,7 @@ var path           = require('path'),
  * @author  Andrew Hart
  * @type {object}
  */
-ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
+var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
     // instance props
     _sourceFilePath: 'app/templates/modules/',
     _targetFilePath: 'app/',
@@ -31,7 +33,7 @@ ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
     _dashedName: '',
 
     constructor: function () {
-        // trigger super constructor
+        // invoke base constructor
         yeoman.generators.NamedBase.apply(this, arguments);
 
         // provide configurable directory for scaffolded scripts
@@ -53,6 +55,9 @@ ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
         // todo: mix this in with option for filename to add generated
         // todo: code to existing *.module.js script
         this.option('module-add', { type: String, required: false, defaults: true });
+
+        // performance option using only in-memory ops for files
+        this.option('perf', { type: String, required: false, defaults: false });
 
         // must pass a filename if not injecting generated script into existing module
         if (!this.options['filename'] && !this.options['module-add']) {
@@ -91,10 +96,8 @@ ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
 
         // get the formatted module names &
         // set them on this instance
-        this.dotModuleName = this._getModuleName();
-        this.hypModuleName = this._getModuleName('-');
-
-        console.log(this.dotModuleName, ScaffoldGenerator.prototype);
+        this.dotModuleName = this._formatModuleName();
+        this.hypModuleName = this._formatModuleName('-');
 
         // set the destination path
         if (typeof this.env.options.appPath === 'undefined') {
@@ -104,31 +107,6 @@ ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
 
         // set the default source path in generator (used by yeoman)
         this.sourceRoot(path.join(__dirname, this._sourceFilePath));
-    },
-
-    /**
-     * Overridden to augment functionality of GeneratorMixin::_getModuleName()
-     *
-     * Constructs a namespaced module name based on the inputs provided
-     * by the user in the previous prompts. Can take an optional `separator`
-     * for use in outputting the name - defaults to `.` if none is provided.
-     *
-     * @param  {String} separator type of char or string used as separator for output
-     * @return {String}           returns fully namespaced module name per rS spec
-     */
-    _getModuleName: function (separator) {
-        // default to dot notation if nothing passed
-        if (!separator) {
-            separator = '.';
-        }
-
-        // appname prop is only persistent state for the generated
-        // app / module name at time of scaffold generator execution
-        if (!this.moduleName || this.moduleName === '') {
-            return this.appname.replace(/-/g, separator);
-        } else {
-            return this.moduleName.replace(/-/g, separator);
-        }
     },
 
     /**
@@ -176,51 +154,135 @@ ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
     },
 
     /**
+     * Takes a source template (e.g. directive.js) script, reads
+     * it into memory as string, renders the template with current
+     * context, & writes it to an in-memory instance of a node
+     * writable stream - finally returning it as a string. 
+     *
+     * @param  {String} src  path to source template
+     * @return {String}      string of compiled template
+     */
+    memTemplate: function (src) {
+        // create writable in-memory stream
+        var templateStream = new streams.WritableStream(),
+            // use mem-fs to read src contents into string
+            srcFile = this.fs.read(
+                path.join(
+                    this.sourceRoot(),
+                    src
+                ) + this._scriptSuffix
+            );
+
+        // compile & render template and write back to memory stream
+        templateStream.write(
+            ejs.render(
+                srcFile, 
+                this,
+                {
+                    cache: true,
+                    filename: 'tmp/compiled.js',
+                    context: this
+                }
+            )
+        );
+
+        return templateStream.toString();
+    },
+
+    /**
      * Accepts the `appTemplate` & `testTemplate` files and delegates
      * to internal methods to copy & template these files into the
      * `target` directory
      *
-     * @param  {String} appTemplate     Source script file to render & copy
+     * @param  {String} srcTemplate     Source script file to render & copy
      * @param  {String} testTemplate    (Optional) Source test file to render & copy
      * @param  {String} targetDirectory Destination for file output
      * @param  {Boolean} skipAdd        If true skips adding the script to index.html
      */
-    generate: function (appTemplate, targetDir, opts) {
+    generate: function (srcTemplate, targetDir, opts) {
+        // build the destination file path + filename
+        var destFile = path.join(targetDir, this.name);
+
         // Services use classified names
         if (this.generatorName && this.generatorName.toLowerCase() === 'service') {
             this._cameledName = this._classedName;
         }
 
-        // place template in proper dir using target script path + target dir
-        this.appTemplate(appTemplate, path.join(targetDir, this.name));
+        // perform template ops in memory and hold reference to data
+        // instead of writing data out to a temporary file on disk
+        if (this.options['perf']) {
+            // invoke inject
+            this.inject(srcTemplate);
+        } else {
+            // place template in proper dir using target script path + target dir
+            this.appTemplate(srcTemplate, destFile);
+        }
 
         // create test script unless user opts out
         if (opts.testTemplate && this.options['include-tests']) {
-            this.testTemplate(opts.testTemplate, path.join(targetDir, this.name));
+            this.testTemplate(opts.testTemplate, destFile);
         }
 
         // inject script reference into index.html if forced
         if (opts.addToIndex) {
-            this.addScriptToIndex(path.join(targetDir, this.name));
+            this.addScriptToIndex(destFile);
         }
         // if filename was not passed then inject script into {app}.module.js
         if (!this.options['filename'] || this.options['module-add']) {
-            // close over to preserve multiple contexts
-            // in case we need both `this`s inside of cb
-            (function (ctx) {
-                ctx._writeFiles(function () {
-                    // file has been flushed from memory
-                    // to disk - now have access to inject
-                    // its contents into dest script
-                    ctx.injectScript(
-                        path.join(
-                            targetDir,
-                            ctx.name
-                        )
-                    );
-                });
-            })(this);
+            if (!this.options['perf']) {
+                // close over to preserve multiple contexts
+                // in case we need both `this`s inside of cb
+                (function (ctx) {
+                    ctx._writeFiles(function () {
+                        // file has been flushed from memory
+                        // to disk - now have access to inject
+                        // its contents into dest script
+                        ctx.injectScript(
+                            destFile
+                        );
+                    });
+                })(this);
+            }
         }
+    },
+
+    /**
+     * Takes the `script` name & injects the specified scripts
+     *  contents into the {appname}.module.js script as a new
+     * dependency
+     *
+     * @param {String} src  name of the script to be added
+     */
+    inject: function (src, dest) {
+        // build in memory templated output string
+        var template = this.memTemplate(src);
+
+        console.log(this.destinationRoot());
+        console.log(
+            path.join(
+                this.options.appPath,
+                this.appname + '/' + this.appname
+            )
+        );
+
+        // load dest script we need to append to
+        var destFile = path.join(
+            this.options.appPath,
+            this.appname + '/' + this.appname + '.module.js'
+        );
+
+        // inject the templated string into another script
+        angularUtils.rewriteFile({
+            file: destFile,
+            needle: ';',
+            splicable: [
+                template
+            ]
+        });
+
+        this.log(chalk.yellow(
+            '\nAdded generated script\'s contents as dependency into ' + this.appname + '.module.js'
+        ));
     },
 
     /**
@@ -241,19 +303,11 @@ ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
                         script.toLowerCase()
                     ) + this._scriptSuffix
                 ),
-                // load source data
-                srcData = '',
                 // load dest script we need to append to
                 destFile = path.join(
                     this.options.appPath,
                     this.appname + '/' + this.appname + '.module.js'
                 );
-
-            // todo: deprecate fs.readFile and use in-memory file handle
-            // todo: to object to grab its data and pass to rewriteFile
-            // todo: - obviates the need to create and write a throw away
-            // todo: file to disk
-
 
             // read source file's contents and append to dest file
             fs.readFile(srcFile, 'utf8', function (err, data) {
@@ -321,4 +375,3 @@ ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
 
 // mixin generator-mixin props onto this obj prototype
 _.extend(ScaffoldGenerator.prototype, GeneratorMixin);
-

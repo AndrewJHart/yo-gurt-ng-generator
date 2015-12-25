@@ -2,7 +2,6 @@
 
 var _                 = require('lodash'),
     util              = require('../util'),
-    GeneratorMixin    = require('../generator-mixin'),
     ScaffoldGenerator = require('../scaffold-base.js');
 
 /**

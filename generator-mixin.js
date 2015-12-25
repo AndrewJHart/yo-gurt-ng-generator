@@ -57,7 +57,7 @@ module.exports = {
     },
 
     /**
-     * Constructs a namespaced module name based on the inputs provided
+     * Constructs the namespaced app/module final name based on the input
      * by the user in the previous prompts. Can take an optional `separator`
      * for use in outputting the name - defaults to `.` if none is provided.
      *
@@ -65,11 +65,8 @@ module.exports = {
      * @return {String}           returns fully namespaced module name per rS spec
      */
     _getModuleName: function (separator) {
-        var out;
-
-        if (!separator) {
-            separator = '.';  // default to dot notation if nothing passed
-        }
+        var out,
+            separator = separator || '.';  // default to dot notation
 
         // check for custom module - has no type output
         if (this._isCustom()) {
@@ -86,6 +83,24 @@ module.exports = {
         }
 
         return out;
+    },
+
+    /**
+     * To be called on the final app / module name for formatting
+     * the dashed version of the final name. This is useful for
+     * generators that are run after the project has been generated.
+     *
+     * @param  {String} separator type of char or string used as separator for output
+     * @return {String}           returns fully namespaced module name per rS spec
+     */
+    _formatModuleName: function (separator) {
+        var separator = separator || '.';
+
+        if (!this.moduleName || this.moduleName === '') {
+            return this.appname.replace(/-/g, separator);
+        } else {
+            return this.moduleName.replace(/-/g, separator);
+        }
     },
 
     /**
