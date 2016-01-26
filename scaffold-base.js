@@ -57,7 +57,7 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
         this.option('module-add', { type: String, required: false, defaults: true });
 
         // performance option using only in-memory ops for files
-        this.option('perf', { type: String, required: false, defaults: false });
+        this.option('perf', { type: String, required: false, defaults: true });
 
         // must pass a filename if not injecting generated script into existing module
         if (!this.options['filename'] && !this.options['module-add']) {
