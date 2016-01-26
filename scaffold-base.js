@@ -216,6 +216,10 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
      * to internal methods to copy & template these files into the
      * `target` directory
      *
+     * @todo   Refactor this so that code flow makes more sense. e.g. 
+     *         currently it checks `perf` option then does some stuff...
+     *         then later it does some other stuff if perf is off... confusing
+     *
      * @param  {String} srcTemplate     Source script file to render & copy
      * @param  {String} testTemplate    (Optional) Source test file to render & copy
      * @param  {String} targetDirectory Destination for file output
