@@ -36,6 +36,22 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
         // invoke base constructor
         yeoman.generators.NamedBase.apply(this, arguments);
 
+        // flow for options when scaffolding should work something like this:
+        //  yo gurt:directive :directive-name --options
+        // By default this will template in memory for performance & then
+        //  amend the projects existing /src/app/**/*.module.js script with 
+        // the newly scaffolded directive.
+        //
+        // If the user wishes to amend a different file than *.module.js with
+        //  the newly scaffolded directive then they can pass the option
+        // `amend-file` & provide the path to the script to add the directive to.
+        //
+        // If the user wants to NOT amend an existing file but instead create
+        //  a new file for the directive then simply pass the option for 
+        // `filename` & pass in a name for the new file. 
+        //  *NOTE* the newly created file will be created within the inner 
+        // directory e.g. /src/app/**/my_directive.js
+
         // provide configurable directory for scaffolded scripts
         this.option('dir', { type: String, required: false });
 
@@ -56,11 +72,17 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
         // todo: code to existing *.module.js script
         this.option('module-add', { type: String, required: false, defaults: true });
 
+        // alternative option to specify path to an existing file for which to amend
+        // with the newly scaffolded script(s) instead of *.module.js -- this 
+        // defaults to false & script will be added to /src/app/**/*.module.js
+        this.option('amend-file', { type: String, required: false, defaults: false });
+
         // performance option using only in-memory ops for files
         this.option('perf', { type: String, required: false, defaults: true });
 
         // must pass a filename if not injecting generated script into existing module
-        if (!this.options['filename'] && !this.options['module-add']) {
+        if (!this.options['filename'] && !this.options['amend-file']) {
+            // @todo: remove this comment - if-then used to check !this.options['module-add']
             this.env.error(chalk.red(
                 'If not injecting generated script into *.module.js then you must pass a filename for output'
             ));
@@ -227,11 +249,11 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
         if (opts.addToIndex) {
             this.addScriptToIndex(destFile);
         }
+
         // if filename was not passed then inject script into {app}.module.js
-        if (!this.options['filename'] || this.options['module-add']) {
+        if (!this.options['filename'] || !this.options['amend-file']) {
             if (!this.options['perf']) {
                 // close over to preserve multiple contexts
-                // in case we need both `this`s inside of cb
                 (function (ctx) {
                     ctx._writeFiles(function () {
                         // file has been flushed from memory
