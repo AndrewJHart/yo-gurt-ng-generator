@@ -9,7 +9,7 @@
 
 ### Containers
 
-Containers are top level wrappers for your application, found in `/src/app/`. Nothing within the container context will be redistributed. (i.e. stuff in `/app/` other than `/rs-{generated name}/`) As mentioned above, `gurt` projects are designed to be run locally where possible. Containers are typically used in one of two ways:
+Containers are top level wrappers for your application, found in `/src/app/`. Nothing within the container context will be redistributed. (i.e. stuff in `/app/` other than `/{namespace}-{generated name}/`) As mentioned above, `gurt` projects are designed to be run locally where possible. Containers are typically used in one of two ways:
 
   * When the current project is designed to be included elsewhere, the container serves as a testbed for the module. It's a good way to play with the redistributable code and show other developers how to interact with it.
   * When the current project is a top level app, in other words you'll be deploying the compiled `gulp:dist` output, the final payload deployed will include the container. In this case, it's best to use the container for wrapper style stuff -- just relegate top level DOM and stuff like navigation logic to the container in this case.
