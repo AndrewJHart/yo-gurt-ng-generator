@@ -1,0 +1,38 @@
+{
+  "name": "<%= hypModuleName %>",
+  "version": "1.0.0",
+  "description": "base ng project",
+  "directory": "bower_components",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "src/app/container.js",
+    "src/app/container.less",
+    "src/app/index.html",
+    "src/app/root.tpl.html",
+    "src/blank.tpl.html",
+    ".bowerrc",
+    "gulpfile.js",
+    "package.json",
+    "config.json"
+  ],
+  "main": [
+    "src/app/<%= hypModuleName %>/<%= hypModuleName %>.module.js",
+    "src/app/<%= hypModuleName %>/<%= hypModuleName %>.ctrl.js",
+    "src/app/<%= hypModuleName %>/<%= hypModuleName %>.routes.js",
+    "src/app/<%= hypModuleName %>/<%= hypModuleName %>.tpl.html",
+    "src/app/<%= hypModuleName %>/main.less"
+  ],
+  "dependencies": {
+    "angular": "~1.4.5",
+    "angular-ui-router": "~0.2.15",
+    "bootstrap": "~3.3.5",
+    "font-awesome": "~4.4.0",
+    "jquery": "~2.1.4",
+    "lodash": "~3.10.1"
+  },
+  "devDependencies": {
+    "angular-mocks": "~1.4.5"
+  }
+}

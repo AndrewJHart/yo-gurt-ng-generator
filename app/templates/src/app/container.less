@@ -1,0 +1,21 @@
+// ---------------------------------------------------------------------------------------
+// All styles in this file are to be used ONLY when running this application as is.
+// If this module is included in another project, these styles will NOT be included.
+// Any styling that is used for functional purposes should instead be included in the
+// appropriate `main.less` file
+//
+// NOTE: The module's `main.less` styling will be applied before these stylings. Therefore
+// any container styling will override the default styles, and should be thought of as a
+// theme.
+// ---------------------------------------------------------------------------------------
+
+@import "bootstrap/less/variables.less";
+@import "bootstrap/less/mixins.less";
+
+// All stylings / imports for 3rd party libraries
+@import "./container_vendor.less";
+
+// All stylings / imports that are specific to this module's implementation in the container
+@import "./container_app.less";
+
+// <-------------------- There should not be any styling in this file -------------------> //

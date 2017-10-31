@@ -1,0 +1,8 @@
+{
+  "directory": "bower_components",
+  "registry" : {
+    "search" : [ "http://bower.rewardstyle.com:5678",
+                 "https://bower.herokuapp.com"],
+    "register" : "http://bower.rewardstyle.com:5678"
+  }
+}
