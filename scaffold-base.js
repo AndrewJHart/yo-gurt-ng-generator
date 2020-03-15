@@ -1,15 +1,15 @@
-'use strict';
+"use strict";
 
-var path           = require('path'),
-    yeoman         = require('yeoman-generator'),
-    angularUtils   = require('./util.js'),
-    chalk          = require('chalk'),
-    fs             = require('fs'),
-    _str           = require('underscore.string'),
-    _              = require('lodash'),
-    streams        = require('memory-streams'),
-    ejs            = require('ejs'),
-    GeneratorMixin = require('./generator-mixin');
+const path           = require('path'),
+      yeoman         = require('yeoman-generator'),
+      angularUtils   = require('./util.js'),
+      chalk          = require('chalk'),
+      fs             = require('fs'),
+      _str           = require('underscore.string'),
+      _              = require('lodash'),
+      streams        = require('memory-streams'),
+      ejs            = require('ejs'),
+      GeneratorMixin = require('./generator-mixin');
 
 /**
  * Scaffold Generator base class extends
@@ -21,7 +21,7 @@ var path           = require('path'),
  * @author  Andrew Hart
  * @type {object}
  */
-var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
+const ScaffoldGenerator = yeoman.generators.NamedBase.extend({
     // instance props
     _sourceFilePath: 'app/templates/modules/',
     _targetFilePath: 'app/',
@@ -93,22 +93,24 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
     },
 
     _configure: function () {
-        var bower = {};
-
-        // load bower.json & look for name and path
-        try {
-            bower = require(path.join(process.cwd(), 'bower.json'));
-        } catch (e) {
-            this.log(e);
-            process.exit(1);
-        }
-
-        // Store the apps name on instance, else try to get an app name
-        if (bower.name) {
-            this.appname = bower.name;
-        } else {
-            this.appname = path.basename(process.cwd());
-        }
+        // var bower = {};
+        //
+        // // load bower.json & look for name and path
+        // try {
+        //     bower = require(path.join(process.cwd(), 'bower.json'));
+        // } catch (e) {
+        //     this.log(e);
+        //     process.exit(1);
+        // }
+        //
+        // // Store the apps name on instance, else try to get an app name
+        // if (bower.name) {
+        //     this.appname = bower.name;
+        // } else {
+        //     this.appname = path.basename(process.cwd());
+        // }
+        
+        this.appname = path.basename(process.cwd());
 
         // store varying versions of this sub-generator's
         // filename for use in templates, etc..
@@ -186,7 +188,7 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
      */
     memTemplate: function (src) {
         // create writable in-memory stream
-        var templateStream = new streams.WritableStream(),
+        let templateStream = new streams.WritableStream(),
             // use mem-fs to read src contents into string
             srcFile = this.fs.read(
                 path.join(
@@ -221,13 +223,12 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
      *         then later it does some other stuff if perf is off... confusing
      *
      * @param  {String} srcTemplate     Source script file to render & copy
-     * @param  {String} testTemplate    (Optional) Source test file to render & copy
-     * @param  {String} targetDirectory Destination for file output
-     * @param  {Boolean} skipAdd        If true skips adding the script to index.html
+     * @param  {String} targetDir    (Optional) Source test file to render & copy
+     * @param  {Object} opts Destination for file output
      */
     generate: function (srcTemplate, targetDir, opts) {
         // build the destination file path + filename
-        var destFile = path.join(targetDir, this.name);
+        let destFile = path.join(targetDir, this.name);
 
         // Services use classified names
         if (this.generatorName && this.generatorName.toLowerCase() === 'service') {
@@ -281,7 +282,7 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
      */
     inject: function (src, dest) {
         // build in memory templated output string
-        var template = this.memTemplate(src);
+        let template = this.memTemplate(src);
 
         console.log(this.destinationRoot());
         console.log(
@@ -292,11 +293,13 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
         );
 
         // load dest script we need to append to
-        var destFile = path.join(
+        let destFile = path.join(
             this.options.appPath,
             this.appname + '/' + this.appname + '.module.js'
         );
 
+        // @todo come back and visit this - we should only need something like
+        // @todo for sub-generators e.g. gen component:myTable | gen funcComponent:MyTable
         // inject the templated string into another script
         angularUtils.rewriteFile({
             file: destFile,
@@ -313,7 +316,7 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
 
     /**
      * Takes the `script` name & injects the specified scripts
-     *  contents into the {appname}.module.js script as a new
+     *  contents into the {appName}.js script as a new
      * dependency
      *
      * @param {String} script  name of the script to be added
@@ -321,16 +324,17 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
     injectScript: function (script) {
         try {
             // load source file
-            var srcFile = process.cwd() + '/' +
+            let srcFile = process.cwd() + '/' +
                 path.join(
                     this.options.appPath,
                     path.join(
                         this.appname,
                         script.toLowerCase()
                     ) + this._scriptSuffix
-                ),
+                );
+            
                 // load dest script we need to append to
-                destFile = path.join(
+                let destFile = path.join(
                     this.options.appPath,
                     this.appname + '/' + this.appname + '.module.js'
                 );
@@ -361,9 +365,9 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
 
         } catch (e) {
             // log error message to interface but don't exit
-            this.log.error(chalk.yellow(
+            this.log.error(chalk.red(
                 e +
-               '\nUnable to find ' + destFile + '. Reference to ' + script + '.js ' + 'not added.\n'
+               '\nUnable to find destination file. Reference to ' + script + '.js ' + 'not added.\n'
             ));
         }
     },
@@ -372,6 +376,7 @@ var ScaffoldGenerator = module.exports = yeoman.generators.NamedBase.extend({
      * Takes the `script` name & injects the specified script
      * into the index.html document as a new dependency
      *
+     * @deprecated @todo this should not be needed
      * @param {String} script  name of the script to be added
      */
     addScriptToIndex: function (script) {

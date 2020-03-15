@@ -23,7 +23,7 @@ var path = require('path'),
  * @type {object}
  */
 module.exports = {
-    // public member vars
+    // public member lets
     modulePrefix: 'rs',
     moduleSuffix: '.js',
     moduleType:    '',
@@ -65,7 +65,7 @@ module.exports = {
      * @return {String}           returns fully namespaced module name per rS spec
      */
     _getModuleName: function (separator) {
-        var out,
+        let out,
             separator = separator || '.';  // default to dot notation
 
         // check for custom module - has no type output
@@ -94,7 +94,7 @@ module.exports = {
      * @return {String}           returns fully namespaced module name per rS spec
      */
     _formatModuleName: function (separator) {
-        var separator = separator || '.';
+        let separator = separator || '.';
 
         if (!this.moduleName || this.moduleName === '') {
             return this.appname.replace(/-/g, separator);
@@ -121,11 +121,11 @@ module.exports = {
      *
      * @param {String} src  Source directory to copy from.
      * @param {String} dest Directory to copy the source files into.
-     * @param {object} ctx  Template context data { key: value } for rendering variables
+     * @param {object} ctx  Template context data { key: value } for rendering letiables
      * @param {object} tplOpts Template options settings to pass to _.template() method
      */
     _templateMany: function (src, dest, ctx, tplOpts) {
-        var root = util.isPathAbsolute(src) ? src : path.join(this.sourceRoot(), src),
+        let root = util.isPathAbsolute(src) ? src : path.join(this.sourceRoot(), src),
             files = glob.sync('**', { dot: true, nodir: true, cwd: root }),
             target;
 
@@ -137,7 +137,7 @@ module.exports = {
         ctx = ctx || this;
 
         // get the path relative to the template root, and copy to the relative destination
-        for (var i in files) {
+        for (let i in files) {
             // Wrapping to filter out unwanted prototype properties from being evaluated. Makes jshint happy
             // I'm unsure what all properties exist in the files object so I'm not comfortable removing any
             // at this time
@@ -165,7 +165,7 @@ module.exports = {
      */
     _copy: function (src, dest, ctx, tplOpts) {
         // invokes yeoman internal base._prepCopy to prep
-        var file = this._prepCopy(src, dest);
+        let file = this._prepCopy(src, dest);
 
         // if not template context is provided default to this
         ctx = ctx || this;
