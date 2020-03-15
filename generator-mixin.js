@@ -53,7 +53,7 @@ module.exports = {
      * @return {Boolean} returns true or false based on user input at prompt
      */
     _isCustom: function () {
-        return this.moduleType === 'custom' ? true : false;
+        return this.moduleType === 'custom';
     },
 
     /**
@@ -65,8 +65,8 @@ module.exports = {
      * @return {String}           returns fully namespaced module name per rS spec
      */
     _getModuleName: function (separator) {
-        let out,
-            separator = separator || '.';  // default to dot notation
+        let out;
+        separator = separator || '.';  // default to dot notation
 
         // check for custom module - has no type output
         if (this._isCustom()) {
@@ -94,7 +94,7 @@ module.exports = {
      * @return {String}           returns fully namespaced module name per rS spec
      */
     _formatModuleName: function (separator) {
-        let separator = separator || '.';
+        separator = separator || '.';
 
         if (!this.moduleName || this.moduleName === '') {
             return this.appname.replace(/-/g, separator);

@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="658ddbca-ca33-4d3c-9d41-fd4fdcc316a1" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.jshintrc" beforeDir="false" afterPath="$PROJECT_DIR$/.jshintrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generator-mixin.js" beforeDir="false" afterPath="$PROJECT_DIR$/generator-mixin.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scaffold-base.js" beforeDir="false" afterPath="$PROJECT_DIR$/scaffold-base.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,7 +57,7 @@
       <option name="presentableId" value="Default" />
       <updated>1584245083582</updated>
       <workItem from="1584245086051" duration="935000" />
-      <workItem from="1584247255800" duration="5610000" />
+      <workItem from="1584247255800" duration="5830000" />
     </task>
     <servers />
   </component>
